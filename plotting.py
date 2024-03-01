@@ -21,6 +21,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import sphviewer
+import moviepy
 
 from .tools import locked_print
 
@@ -39,12 +40,6 @@ for ival,cmapval in enumerate(cmaplist_gas):
     cmaplist_gas[ival,:3] = matplotlib.colors.hsv_to_rgb(hsv)
     cmaplist_gas[ival,-1] = (ival+1)/256
 cmap_gas = matplotlib.colors.ListedColormap(cmaplist_gas)
-
-
-
-
-
-
 
 # This function is used to plot the evolution of the properties of a galaxy specified by its ID.
 def plot_glxevol(simulation,id=None):
