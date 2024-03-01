@@ -206,7 +206,7 @@ def plot_glxsep(simulation,id1=None,id2=None):
     tlims=(snaptime[0]-0.1,snaptime[-1]+0.1)
 
     #figure
-    fig,axes=plt.subplots(nrows=1,ncols=2,figsize=(6,2.5))
+    fig,axes=plt.subplots(nrows=1,ncols=2,figsize=(6,2.5),gridspec_kw={'left':0.15,'right':0.95,'bottom':0.1,'top':0.95,'hspace':0.2,'wspace':0.3})
     fig.set_dpi(dpi)
     for ax in axes:
         ax.grid(True,which='major',alpha=1)
