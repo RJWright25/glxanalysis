@@ -21,7 +21,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import sphviewer
-import moviepy
+import moviepy.video.io.ImageSequenceClip
 
 from .tools import locked_print
 
