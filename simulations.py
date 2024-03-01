@@ -406,7 +406,7 @@ class gadget_simulation:
                     for img in os.listdir(image_folder)
                     if img.endswith(".png")])
         clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        clip.write_videofile(f'plots/render_sim/animation.mp4')
+        clip.write_videofile(f'plots/render_sim/animation_{type}.mp4')
     
 
     # Method to render a merger 
