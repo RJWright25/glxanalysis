@@ -280,6 +280,7 @@ class gadget_simulation:
         #start the processes
         procs=[]
         for iproc in range(numproc):
+            time.sleep(0.1)
             snapshots_ichunk=snapshot_chunks[iproc]
             if verbose:
                 print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])
@@ -319,6 +320,9 @@ class gadget_simulation:
         """
         with open(fname, 'wb') as f:
             pickle.dump(self, f)
+        f.close()
+
+        print(f'Simulation object saved as {fname}.')
     
 
     ######################################################################################################
@@ -403,6 +407,7 @@ class gadget_simulation:
         #start the processes
         procs=[]
         for iproc in range(numproc):
+            time.sleep(0.1)
             snapshots_ichunk=snapshots_chunks[iproc]
             if verbose:
                 print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])
@@ -445,6 +450,7 @@ class gadget_simulation:
 
         procs=[]
         for iproc in range(numproc):
+            time.sleep(0.1)
             snapshots_ichunk=snapshots_chunks[iproc]
             if verbose:
                 print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])            
