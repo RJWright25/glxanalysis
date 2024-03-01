@@ -111,7 +111,7 @@ def plot_glxevol(simulation,id=None):
         os.mkdir(os.getcwd()+'/plots/')
 
     fig.set_dpi(dpi)
-    plt.savefig(os.getcwd()+'/plots/'+f'glxevol_{int(id)}.png',bbox_inches='tight')
+    plt.savefig(os.getcwd()+'/plots/'+f'glxevol_{int(id)}.png',bbox_inches='tight',dpi=dpi)
 
     return fig,axes
 
@@ -244,7 +244,7 @@ def plot_glxsep(simulation,id1=None,id2=None):
         os.mkdir(os.getcwd()+'/plots/')
 
     fig.set_dpi(dpi)
-    plt.savefig(os.getcwd()+'/plots/'+f'glxsep_{int(id1)}_{int(id2)}.png',bbox_inches='tight')
+    plt.savefig(os.getcwd()+'/plots/'+f'glxsep_{int(id1)}_{int(id2)}.png',bbox_inches='tight',dpi=dpi)
 
     return fig,axes
 
