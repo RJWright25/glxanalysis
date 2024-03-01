@@ -19,6 +19,7 @@
 import os
 import time
 import h5py
+import pickle
 import numpy as np
 import pandas as pd
 import astropy.units as apy_units
@@ -306,6 +307,19 @@ class gadget_simulation:
         self.galaxies=galaxies
         return galaxies
     
+    def save_as_pickle(self, fname):
+        """
+        Save the simulation object as a pickle file.
+
+        Parameters:
+        -----------
+        fname: str
+            The name of the file to save the simulation object to.
+
+        """
+        with open(fname, 'wb') as f:
+            pickle.dump(self, f)
+    
 
     ######################################################################################################
     ########################################## Plotting methods ##########################################
@@ -448,3 +462,5 @@ class gadget_simulation:
                     if img.endswith(".png")])
         clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
         clip.write_videofile(f'plots/render_merger_{int(ids[0])}_{int(ids[1])}/animation.mp4')
+
+
