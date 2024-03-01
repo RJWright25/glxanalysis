@@ -318,6 +318,8 @@ class gadget_simulation:
             The name of the file to save the simulation object to.
 
         """
+        if os.path.exists(fname):
+            os.remove(fname)
         with open(fname, 'wb') as f:
             pickle.dump(self, f)
         f.close()
