@@ -20,9 +20,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
-
 import sphviewer
-import moviepy.video.io.ImageSequenceClip
 
 from .tools import locked_print
 
@@ -462,8 +460,8 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
         ax.add_artist(plt.Circle(radius=rad1,xy=[x1-center[0],y1-center[1]],color=f'w',lw=0.5,ls='--',fill=False,zorder=2))
         
         if not merged:
-            ax.scatter(x2-center[0],y2-center[1],s=2,c=f'w')
-            ax.scatter(x2-center[0],y2-center[1],s=1,c=f'k')
+            ax.scatter(x2-center[0],y2-center[1],s=2,c=f'w',zorder=2)
+            ax.scatter(x2-center[0],y2-center[1],s=1,c=f'k',zorder=2)
             ax.add_artist(plt.Circle(radius=rad2,xy=[x2-center[0],y2-center[1]],color=f'w',lw=0.5,ls='--',fill=False,zorder=2))
         else:
             ax.text(x=0.05,y=0.95,s='Merged',transform=ax.transAxes,ha='left',va='top',color='w')
