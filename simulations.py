@@ -65,6 +65,8 @@ class gadget_simulation:
         The list of redshifts of the snapshots.
     hubble: float
         The value of H0/100 from the adopted cosmology.
+    cosmology: astropy.cosmology
+        The adopted cosmology.
 
     """
 
@@ -74,6 +76,8 @@ class gadget_simulation:
             snapshot_type = gadget_idealised_snapshot_hki
         elif snapshot_type=='gadget_idealised_snapshot_hki':
             snapshot_type = gadget_idealised_snapshot_hki
+        elif snapshot_type=='gadget_cosmo_snapshot_hki':
+            snapshot_type = gadget_cosmo_snapshot_hki
         else:
             print('Error: snapshot type not recognized.')
             return None
