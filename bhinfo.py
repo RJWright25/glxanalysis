@@ -76,14 +76,9 @@ def postprocess_bhdata(path=None):
     BHIDs = np.array(list(BHDetails.keys()))
     BHIDs = np.array([int(BHIDs[ibh]) for ibh in range(BHNum)])
 
-    # Get the number of columns
-    col_num = len(BHDetails[str(BHIDs[0])].columns)
-    print('Column count = ', col_num)
-
-    columns=np.array(['Time','bh_M','bh_Mdot','rho','cs','gas_Vrel_tot','idk1','idk2','idk3','Coordinates_x','Coordinates_y','Coordinates_z','V_x','V_y','V_z','gas_Vrel_x','gas_Vrel_y','gas_Vrel_z','Flag_binary','companion_ID','bh_hsml'])[:col_num]
     # Rename the columns
     for ibh in range(BHNum):
-        BHDetails[str(BHIDs[ibh])].columns = columns
+        BHDetails[str(BHIDs[ibh])].columns[1] = 'Time'
 
     # Sort according to time
     for ibh in range(BHNum):
