@@ -49,7 +49,7 @@ def postprocess_bhdata(path=None):
     # Load files
     for file_index in list(range(fileNum))[:]:
         if file_index % 10 == 0:
-            print(file_index)
+            print('Processing file:', file_index+1, '/', fileNum)
 
         fileName = f"{path}/blackhole_details/blackhole_details_{file_index}.txt"
         data = pd.read_csv(fileName, header=None, delimiter=" ")
