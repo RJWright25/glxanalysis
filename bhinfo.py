@@ -47,7 +47,7 @@ def postprocess_bhdata(path=None):
 
     BHDetails = {}
     # Load files
-    for file_index in list(range(fileNum))[:]:
+    for file_index in list(range(fileNum))[:20]:
         if file_index % 10 == 0:
             print('Processing file:', file_index+1, '/', fileNum)
 
@@ -80,9 +80,12 @@ def postprocess_bhdata(path=None):
     col_num = len(BHDetails[str(BHIDs[0])].columns)
     print('Column count = ', col_num)
 
+
+
     # Sort according to time
     for ibh in range(BHNum):
-        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[2])
+        print(BHDetails[str((BHIDs[ibh]))])
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=1,inplace=True)
         BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
         
     # Save files
