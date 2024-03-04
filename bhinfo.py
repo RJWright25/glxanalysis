@@ -18,6 +18,92 @@ import os
 import numpy as np
 import pandas as pd
 
+# This function is used to postprocess the blackhole details files. (credit: Shihong Liao reprocess.py)
+def bhpostprocess(simulation=None, path=None):
+    """
+    Postprocesses the black hole details files.
+
+    Parameters:
+    -----------
+    simulation: simulation object
+        The simulation object for which the black hole details are to be postprocessed.
+    path: str
+        The path to the directory containing the black hole details files.
+    """
+
+    # if no path, get from simulation
+    if not path and not simulation== None:
+        path=simulation.snapshots[0].snapshot_file.split('/')[:-1]
+        path='/'.join(path)+'/blackhole_details/'
+    else:
+        print('No path given. Exiting...')
+        return None
+
+    # Specify file path and target BH ids
+    fileNum = 0
+    fileName = f"{path}/blackhole_details/blackhole_details_{fileNum}.txt"
+
+    while(os.path.isfile(fileName)):
+        fileNum += 1
+        fileName = f"{path}/blackhole_details/blackhole_details_{fileNum}.txt" 
+    print('Total files found:', fileNum)
+
+    BHDetails = {}
+    # Load files
+    for file_index in list(range(fileNum))[:]:
+        if file_index % 10 == 0:
+            print(file_index)
+
+        fileName = f"{path}/blackhole_details/blackhole_details_{file_index}.txt"
+        data = pd.read_csv(fileName, header=None, delimiter=" ")
+        # data[0] contains "BH=ID". Find the unique BH IDs in this file:
+        BHIDsInFile = data[0].str.extract('BH=(\d+)').values.flatten()
+        BHIDsInFile = [int(BHID) for BHID in BHIDsInFile if np.isfinite(np.float32(BHID))]
+        BHIDsInFile = np.unique(BHIDsInFile)
+        BHNum= len(BHIDsInFile)
+        
+        for ibh in range(BHNum):
+            BHID=BHIDsInFile[ibh]
+            select_data = data.loc[data[0].str.contains(f'BH={BHID}'),:]
+            if not f'{BHID}' in BHDetails:
+                BHDetails[f'{BHID}'] = select_data
+            else:
+                BHDetails[f"{BHID}"] = [BHDetails[f"{BHID}"],select_data]
+                BHDetails[f"{BHID}"] = pd.concat(BHDetails[f"{BHID}"],ignore_index=True)
+
+    # Get the number of BHs
+    BHNum = len(BHDetails)
+    print('BH number = ', BHNum)
+
+    # Get the BH IDs
+    BHIDs = np.array(list(BHDetails.keys()))
+    BHIDs = np.array([int(BHIDs[ibh]) for ibh in range(BHNum)])
+
+    # Get the number of columns
+    col_num = len(BHDetails[str(BHIDs[0])].columns)
+    print('Column count = ', col_num)
+
+    # Sort according to time
+    for ibh in range(BHNum):
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[2])
+        BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
+        
+    # Save files
+    if not os.path.exists('blackhole_details_post_processing'):
+        os.mkdir('blackhole_details_post_processing')
+    else:
+        # Remove all files in the directory
+        files = os.listdir('blackhole_details_post_processing')
+        for file in files:
+            os.remove(f'blackhole_details_post_processing/{file}')
+
+    for ibh in range(BHNum):
+        fname = f'blackhole_details_post_processing/BH_{BHIDs[ibh]}.txt'
+        BHDetails[str(BHIDs[ibh])].to_csv(fname, sep=' ', index=False, header=False)
+
+    return BHDetails
+
+
 # This function is used to read the black hole details from a file
 def read_bhdata(simulation,path=None,bhids=None,subsample=1):
     """
@@ -42,8 +128,13 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
 
     """
     if not path:
-        print('No path given. Exiting...')
-        return None
+        path=simulation.snapshots[0].snapshot_file.split('/')[:-1]
+        path='/'.join(path)+'/blackhole_details_post_processing/'
+        if os.path.exists(path):
+            print(f'Using path {path} to read black hole details...')
+        else:
+            print('No path found. Exiting...')
+            return None
     
     #find all the files in the directory
     bhfiles=np.array([path+fname for fname in os.listdir(path) if 'BH' in fname])
@@ -58,6 +149,13 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
     bhids=bhids[np.argsort(bhids)]
     bhfiles=bhfiles[np.argsort(bhids)]
 
+    #columns
+    fpath=path+f'/BH_{str(int(bhids[0]))}.txt'
+    bhdata_ibh=np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float)
+    numcol=bhdata_ibh.shape[-1]
+    columns=np.array(['Time','bh_M','bh_Mdot','rho','cs','gas_Vrel_tot','Coordinates_x','Coordinates_y','Coordinates_z','V_x','V_y','V_z','gas_Vrel_x','gas_Vrel_y','gas_Vrel_z','Flag_binary','companion_ID','bh_hsml'])
+    columns=columns[:numcol]
+
     #initialize the output
     bhdata={}
 
@@ -67,8 +165,12 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         fpath=path+f'/BH_{str(int(bhid))}.txt'
         bhdata_ibh=np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float)
 
-        bhdata_ibh=pd.DataFrame(bhdata_ibh,columns=['Time','bh_M','bh_Mdot','rho','cs','gas_Vrel_tot','Coordinates_x','Coordinates_y','Coordinates_z','V_x','V_y','V_z','gas_Vrel_x','gas_Vrel_y','gas_Vrel_z','Flag_binary','companion_ID','bh_hsml','Mass','NumCurrentTiStep'])
+        bhdata_ibh=pd.DataFrame(bhdata_ibh,columns=columns)
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
+
+        #if cosmo, convert afac to time
+        if simulation.snapshot_type=='cosmo':
+            bhdata_ibh['Time']=simulation.cosmo.age(1/bhdata_ibh['Time']-1)
 
         #convert to physical units
         bhdata_ibh['bh_M']=bhdata_ibh['bh_M']*1e10/simulation.hubble

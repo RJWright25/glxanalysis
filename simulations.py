@@ -50,6 +50,10 @@ class gadget_simulation:
     snapshot_file_list: list
         The list of paths to the snapshot files.
 
+    snapshot_type: str
+        The type of snapshot to use (e.g. 'gadget_idealised_snapshot_hki' or 'gadget_cosmo_snapshot_hki').
+
+
 
     Attributes:
     -----------
@@ -72,15 +76,22 @@ class gadget_simulation:
 
     # Initialize the simulation object, take a list of snapshot files and create a list of snapshot objects
     def __init__(self, snapshot_file_list, snapshot_type=None):
+        
+        
+
         if snapshot_type is None:
             snapshot_type = gadget_idealised_snapshot_hki
+            self.snapshot_type = 'idealised'
         elif snapshot_type=='gadget_idealised_snapshot_hki':
             snapshot_type = gadget_idealised_snapshot_hki
+            self.snapshot_type = 'idealised'
         elif snapshot_type=='gadget_cosmo_snapshot_hki':
             snapshot_type = gadget_cosmo_snapshot_hki
+            self.snapshot_type = 'cosmo'
         else:
             print('Error: snapshot type not recognized.')
             return None
+
 
         self.snapshot_flist = snapshot_file_list;times=[h5py.File(snapshot_file, 'r')['Header'].attrs['Time'] for snapshot_file in self.snapshot_flist]
         self.snapshot_flist = [snapshot_file for _,snapshot_file in sorted(zip(times,self.snapshot_flist))]
@@ -120,6 +131,7 @@ class gadget_simulation:
             print('Error: must provide either time or redshift')
             return None
         return self.snapshots[idx]
+    
     
     # Method to load the black hole details from a directory
     def load_bhdata(self,path=None,bhids=None,subsample=1):
