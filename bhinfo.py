@@ -89,7 +89,7 @@ def postprocess_bhdata(path=None):
 
     # Sort according to time
     for ibh in range(BHNum):
-        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=['Time'],inplace=True)
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=['Time'])
         BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
         
     # Save files
