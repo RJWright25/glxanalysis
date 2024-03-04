@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 # This function is used to postprocess the blackhole details files. (credit: Shihong Liao reprocess.py)
-def postprocess_bhdata(simulation=None, path=None):
+def postprocess_bhdata(path=None):
     """
     Postprocesses the black hole details files.
 
@@ -32,10 +32,7 @@ def postprocess_bhdata(simulation=None, path=None):
     """
 
     # if no path, get from simulation
-    if not path and not simulation== None:
-        path=simulation.snapshots[0].snapshot_file.split('/')[:-1]
-        path='/'.join(path)+'/blackhole_details/'
-    else:
+    if not path:
         print('No path given. Exiting...')
         return None
 
