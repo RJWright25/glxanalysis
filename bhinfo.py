@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 # This function is used to postprocess the blackhole details files. (credit: Shihong Liao reprocess.py)
-def bhpostprocess(simulation=None, path=None):
+def postprocess_bhdata(simulation=None, path=None):
     """
     Postprocesses the black hole details files.
 
