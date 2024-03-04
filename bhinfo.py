@@ -85,6 +85,7 @@ def postprocess_bhdata(path=None):
     # Sort according to time
     for ibh in range(BHNum):
         print(BHDetails[str((BHIDs[ibh]))])
+        BHDetails[str((BHIDs[ibh]))].loc[:,1] = BHDetails[str((BHIDs[ibh]))].loc[:,1].astype(float)
         BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=1,inplace=True)
         BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
         
