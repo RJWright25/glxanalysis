@@ -531,6 +531,7 @@ class gadget_cosmo_snapshot_hki:
 
                         #convert DM mass if necessary
                         if key == 'Masses' and ptype == 1:
+                            print('DM mass: ', f"{self.mass_dm:.3e} Msun")
                             particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
 
                     #if the key is a derived field, get the data and apply the conversion
