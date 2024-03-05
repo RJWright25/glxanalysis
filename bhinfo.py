@@ -71,7 +71,7 @@ def postprocess_bhdata(path=None):
     #check first value of each column to see if it is a nan
     BHIDs = np.array(list(BHDetails.keys()))
     BHIDs = np.array([int(BHIDs[ibh]) for ibh in range(BHNum)])
-    for ibh in range(len(BHDetails)):
+    for ibh in range(len(BHIDs)):
         BHDetails[f"{BHIDs[ibh]}"]=BHDetails[f"{BHIDs[ibh]}"].dropna(axis=1,how='all')
 
     # Get the number of BHs
