@@ -145,10 +145,14 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         #get particle data within 1000 kpc of the center and sort by radius
         pdata_m200=snapshot.get_particle_data(keys=['Coordinates','Masses'],types=[1],center=center,radius=500*apy_units.kpc)
         radius=pdata_m200['R'].values
+
         sorted_radius=np.argsort(radius)
         sorted_cummass=np.cumsum(pdata_m200['Masses'].values[sorted_radius])
         sorted_radius=radius[sorted_radius];sorted_volume=4/3*np.pi*(sorted_radius)**3
         sorted_cumdens=sorted_cummass/(sorted_volume)
+
+        print(sorted_radius)
+        print(sorted_cummass)
 
         print(critdens)
         print(sorted_cumdens[::100])
