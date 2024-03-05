@@ -68,6 +68,10 @@ def postprocess_bhdata(path=None):
                 BHDetails[f"{BHID}"] = [BHDetails[f"{BHID}"],select_data]
                 BHDetails[f"{BHID}"] = pd.concat(BHDetails[f"{BHID}"],ignore_index=True)
 
+    #check first value of each column to see if it is a nan
+    for ibh in range(len(BHDetails)):
+        BHDetails[f"{BHIDs[ibh]}"]=BHDetails[f"{BHIDs[ibh]}"].dropna(axis=1,how='all')
+
     # Get the number of BHs
     BHNum = len(BHDetails)
     print('BH number = ', BHNum)
@@ -76,12 +80,6 @@ def postprocess_bhdata(path=None):
     BHIDs = np.array(list(BHDetails.keys()))
     BHIDs = np.array([int(BHIDs[ibh]) for ibh in range(BHNum)])
 
-
-    # if a column is full of NaN, remove it
-    for ibh in range(BHNum):
-        for icol in range(1,BHDetails[str(BHIDs[ibh])].shape[1]):
-            if np.nansum(np.isnan(np.float64(BHDetails[str(BHIDs[ibh])].iloc[:,icol])))>=BHDetails[str(BHIDs[ibh])].shape[0]/2:
-                BHDetails[str(BHIDs[ibh])] = BHDetails[str(BHIDs[ibh])].drop(BHDetails[str(BHIDs[ibh])].columns[icol], axis=1)
     #print number of columns
     print('Number of columns:',BHDetails[str(BHIDs[0])].shape[1])
 
