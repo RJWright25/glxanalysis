@@ -67,13 +67,6 @@ def postprocess_bhdata(path=None):
             else:
                 BHDetails[f"{BHID}"] = [BHDetails[f"{BHID}"],select_data]
                 BHDetails[f"{BHID}"] = pd.concat(BHDetails[f"{BHID}"],ignore_index=True)
-
-    #Remove string columns
-    for ibh in range(BHNum):
-        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[f"{BHIDs[ibh]}"].drop(columns=[0])
-    
-    print(BHDetails[str(BHIDs[0])])
-
         
     #check first value of each column to see if it is a nan
     BHIDs = np.array(list(BHDetails.keys()))
@@ -88,8 +81,12 @@ def postprocess_bhdata(path=None):
     #print number of columns
     print('Number of columns:',BHDetails[str(BHIDs[0])].shape[1])
 
-    print()
-
+    #Remove string columns
+    for ibh in range(BHNum):
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[f"{BHIDs[ibh]}"].drop(columns=[0])
+    
+    print(BHDetails[str(BHIDs[0])])
+    
     # Sort according to time
     for ibh in range(BHNum):
         BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[1])
