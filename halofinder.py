@@ -151,9 +151,9 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         sorted_radius=radius[sorted_radius];sorted_volume=4/3*np.pi*(sorted_radius)**3
         sorted_cumdens=sorted_cummass/(sorted_volume)
 
-        print(pdata_m200)
-        print(sorted_radius)
-        print(sorted_cummass)
+        # print(pdata_m200)
+        # print(sorted_radius)
+        # print(sorted_cummass)
 
         iradius=len(sorted_cumdens)-np.searchsorted(sorted_cumdens[::-1],critdens)
     
