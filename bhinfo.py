@@ -75,7 +75,7 @@ def postprocess_bhdata(path=None):
         BHDetails[f"{BHIDs[ibh]}"]=BHDetails[f"{BHIDs[ibh]}"].dropna(axis=1,how='all')
 
     # Get the number of BHs
-    BHNum = len(BHDetails)
+    BHNum = len(BHIDs)
     print('BH number = ', BHNum)
 
     #print number of columns
@@ -86,7 +86,7 @@ def postprocess_bhdata(path=None):
         BHDetails[f"{BHIDs[ibh]}"] = BHDetails[f"{BHIDs[ibh]}"].drop(columns=[0])
     
     print(BHDetails[str(BHIDs[0])])
-    
+
     # Sort according to time
     for ibh in range(BHNum):
         BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[1])
