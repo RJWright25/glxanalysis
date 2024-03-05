@@ -47,7 +47,7 @@ def postprocess_bhdata(path=None):
 
     BHDetails = {}
     # Load files
-    for file_index in list(range(fileNum))[:20]:
+    for file_index in list(range(fileNum))[:]:
         if file_index % 10 == 0:
             print('Processing file:', file_index+1, '/', fileNum)
 
