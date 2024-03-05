@@ -78,18 +78,25 @@ def postprocess_bhdata(path=None):
     BHNum = len(BHIDs)
     print('BH number = ', BHNum)
 
-    #print number of columns
-    print('Number of columns:',BHDetails[str(BHIDs[0])].shape[1])
-
     #Remove string columns
     for ibh in range(BHNum):
         BHDetails[f"{BHIDs[ibh]}"] = BHDetails[f"{BHIDs[ibh]}"].drop(columns=[0])
-    
-    print(BHDetails[str(BHIDs[0])])
 
+    #print number of columns
+    numcol=BHDetails[str(BHIDs[0])].shape[1]
+    print('Number of columns:',BHDetails[str(BHIDs[0])].shape[1])
+    
+    # Add column names
+    for ibh in range(BHNum):
+        BHDetails[f"{BHIDs[ibh]}"].columns = ['Time', 'bh_M', 'bh_Mdot', 'rho', 'cs', 'gas_Vrel_tot', 'Coordinates_x', 'Coordinates_y', 'Coordinates_z', 'V_x', 'V_y', 'V_z', 'gas_Vrel_x', 'gas_Vrel_y', 'gas_Vrel_z', 'Flag_binary', 'companion_ID', 'bh_hsml'][:numcol]
+    
+    #ensure all are floats
+    for ibh in range(BHNum):
+        BHDetails[f"{BHIDs[ibh]}"]=BHDetails[f"{BHIDs[ibh]}"].astype(float)
+        
     # Sort according to time
     for ibh in range(BHNum):
-        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[1])
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=['Time'])
         BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
         
     # Save files
