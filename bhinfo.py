@@ -76,9 +76,6 @@ def postprocess_bhdata(path=None):
     BHIDs = np.array(list(BHDetails.keys()))
     BHIDs = np.array([int(BHIDs[ibh]) for ibh in range(BHNum)])
 
-    # Rename the columns
-    for ibh in range(BHNum):
-        BHDetails[str(BHIDs[ibh])].columns[1] = 'Time'
 
     # if a column is full of NaN, remove it
     for ibh in range(BHNum):
@@ -91,7 +88,7 @@ def postprocess_bhdata(path=None):
 
     # Sort according to time
     for ibh in range(BHNum):
-        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=['Time'])
+        BHDetails[f"{BHIDs[ibh]}"] = BHDetails[str((BHIDs[ibh]))].sort_values(by=[1])
         BHDetails[f"{BHIDs[ibh]}"].reset_index(inplace=True,drop=True)
         
     # Save files
