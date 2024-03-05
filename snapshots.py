@@ -400,6 +400,7 @@ class gadget_cosmo_snapshot_hki:
             self.cosmology = apy_cosmo.FlatLambdaCDM(H0=self.hubble*100, Om0=self.Om0)
             self.XH=0.76
             self.XHe=0.24
+            self.mass_dm=snapshot['Header'].attrs['MassTable'][1]*1e10/self.hubble
             #get time from cosmology and afac
             self.time=self.cosmology.age(self.redshift).value
 
@@ -527,7 +528,11 @@ class gadget_cosmo_snapshot_hki:
                         elif len(particle_data[ptype][key].shape)==2:
                             del particle_data[ptype][key]
                             particle_data[ptype][key+f'_{str(0).zfill(2)}'] = part[key][:][mask][:,0][::subsample]*self.conversions[key]
-                    
+
+                        #convert DM mass if necessary
+                        if key == 'Masses' and ptype == 1:
+                            particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
+
                     #if the key is a derived field, get the data and apply the conversion
                     elif key in self.derived_fields_available and ptype == self.derived_fields_ptype[key]:
                         particle_data[ptype][key] = self.get_derived_field(key, ptype)[mask][::subsample]
