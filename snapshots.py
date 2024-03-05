@@ -402,6 +402,7 @@ class gadget_cosmo_snapshot_hki:
             self.XHe=0.24
             #get time from cosmology and afac
             self.time=self.cosmology.age(self.redshift).value
+            print(f'Time of snapshot: {self.time} Gyr')
 
         snapshot.close()
 
