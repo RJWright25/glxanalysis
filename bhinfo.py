@@ -181,7 +181,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
 
         #if cosmo, convert afac to time
         if simulation.snapshot_type=='cosmo':
-            bhdata_ibh['Time']=simulation.cosmology.age(1/bhdata_ibh['Time']-1)
+            bhdata_ibh['Time']=simulation.cosmology.age(1/bhdata_ibh['Time'].values-1).value
 
         #convert to physical units
         bhdata_ibh['bh_M']=bhdata_ibh['bh_M']*1e10/simulation.hubble
