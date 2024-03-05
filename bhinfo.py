@@ -80,7 +80,7 @@ def postprocess_bhdata(path=None):
     # if a column is full of NaN, remove it
     for ibh in range(BHNum):
         for icol in range(1,BHDetails[str(BHIDs[ibh])].shape[1]):
-            if np.all(np.isnan(BHDetails[str(BHIDs[ibh])].iloc[:,icol])):
+            if np.nansum(np.isnan(np.float64(BHDetails[str(BHIDs[ibh])].iloc[:,icol])))>=BHDetails[str(BHIDs[ibh])].shape[0]/2:
                 BHDetails[str(BHIDs[ibh])] = BHDetails[str(BHIDs[ibh])].drop(BHDetails[str(BHIDs[ibh])].columns[icol], axis=1)
     #print number of columns
     print('Number of columns:',BHDetails[str(BHIDs[0])].shape[1])
