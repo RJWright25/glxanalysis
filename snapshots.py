@@ -528,11 +528,10 @@ class gadget_cosmo_snapshot_hki:
                         elif len(particle_data[ptype][key].shape)==2:
                             del particle_data[ptype][key]
                             particle_data[ptype][key+f'_{str(0).zfill(2)}'] = part[key][:][mask][:,0][::subsample]*self.conversions[key]
+                    if key == 'Masses' and ptype == 1:
+                        print('DM mass: ', f"{self.mass_dm:.3e} Msun")
+                        particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
 
-                        #convert DM mass if necessary
-                        if key == 'Masses' and ptype == 1:
-                            print('DM mass: ', f"{self.mass_dm:.3e} Msun")
-                            particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
 
                     #if the key is a derived field, get the data and apply the conversion
                     elif key in self.derived_fields_available and ptype == self.derived_fields_ptype[key]:
