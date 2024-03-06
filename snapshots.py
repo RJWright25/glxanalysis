@@ -218,6 +218,10 @@ class gadget_idealised_snapshot_hki:
                 #iterate over the requested keys
                 for key in keys:
                     #if the key is available directly from file, get the data and apply the conversion
+                    raw=part[key][:][mask]
+                    print(f'key: {key}, shape: {raw.shape}')
+                    print(raw)
+                    
                     if key in part.keys():
                         particle_data[ptype][key] = part[key][:][mask]*self.conversions[key]
                         if len(particle_data[ptype][key].shape)==2 and particle_data[ptype][key].shape[1] == 3:
@@ -235,6 +239,7 @@ class gadget_idealised_snapshot_hki:
 
                     #if the key is not available for this type, fill with NaNs
                     else:
+                        print(f'Error: key {key} not found for particle type', ptype)
                         particle_data[ptype][key]=np.zeros(num_particles)[::subsample]+np.nan
                 
                 #add a column for the particle type

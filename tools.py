@@ -34,7 +34,9 @@ def locked_print(string):
     Returns:
     -----------
     None (prints the string to the console)
+
     """
+
     print_lock = Lock()
     print_lock.acquire()
     print(string)
@@ -59,60 +61,4 @@ def split_list(lst,nproc):
     
     """
     return [lst[i::nproc] for i in range(nproc)]
-
-
-# This function is used to postprocess the blackhole details files. (credit: Shihong Liao reprocess.py)
-def postprocess_bhinfo(filePath):
-
-    # Specify file path and target BH ids
-    fileNum = 0
-    fileName = "%sblackhole_details/blackhole_details_%d.txt" % (filePath, fileNum)
-    while(os.path.isfile(fileName)):
-        fileNum += 1
-        fileName = "%sblackhole_details/blackhole_details_%d.txt" % (filePath, fileNum)
-
-    print('Total files found:', fileNum)
-
-    BHDetails = {}
-    # Load files
-    for file_index in range(fileNum):
-        if file_index % 100 == 0:
-            print(file_index)
-        fileName = "%sblackhole_details/blackhole_details_%d.txt" % (filePath, file_index)
-        data = pd.read_csv(fileName, header=None, delimiter=" ")
-        # data[0] contains "BH=ID". Find the unique BH IDs in this file:
-        BHIDsInFile = data[0].str.extract('BH=(\d+)').astype(int).values.flatten()
-        BHIDsInFile = np.unique(BHIDsInFile)
-        BHNum= len(BHIDsInFile)
-        for i in range(BHNum):
-            select_data = data.loc[data[0].str.contains('BH=%d' % BHIDsInFile[i]),:]
-            if file_index == 0:
-                BHDetails['BH%d' % (BHIDsInFile[i])] = select_data
-            else:
-                BHDetails['BH%d' % (BHIDsInFile[i])] = [BHDetails['BH%d' % (BHIDsInFile[i])],select_data]
-                BHDetails['BH%d' % (BHIDsInFile[i])] = pd.concat(BHDetails['BH%d' % (BHIDsInFile[i])])
-
-    # Get the number of BHs
-    BHNum = len(BHDetails)
-    print('BH number = ', BHNum)
-
-    # Get the BH IDs
-    BHIDs = np.array(list(BHDetails.keys()))
-    BHIDs = np.array([int(BHIDs[i][2:]) for i in range(BHNum)])
-
-    # Get the number of columns
-    col_num = len(BHDetails['BH%d' % (BHIDs[0])]['data'].columns)
-    print('column number = ', col_num)
-
-    # Sort according to time
-    for i in range(BHNum):
-        BHDetails['BH%d' % (BHIDs[i])] = BHDetails['BH%d' % (BHIDs[i])]['data'].sort_values(by=[col_num-1])
-
-    # Save files
-    if not os.path.exists(filePath + 'blackhole_details_post_processing'):
-        os.makedirs(filePath + 'blackhole_details_post_processing')
-    for i in range(BHNum):
-        fname = './BH_%d.txt' % (BHIDs[i])
-        BHDetails['BH%d' % (BHIDs[i])].to_csv(fname, sep=' ', index=False, header=False)
-
 
