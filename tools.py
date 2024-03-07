@@ -34,9 +34,7 @@ def locked_print(string):
     Returns:
     -----------
     None (prints the string to the console)
-
     """
-
     print_lock = Lock()
     print_lock.acquire()
     print(string)
@@ -61,4 +59,5 @@ def split_list(lst,nproc):
     
     """
     return [lst[i::nproc] for i in range(nproc)]
+
 
