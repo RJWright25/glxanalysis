@@ -523,10 +523,6 @@ class gadget_cosmo_snapshot_hki:
                 #iterate over the requested keys
                 for key in keys:
                     #if the key is available directly from file, get the data and apply the conversion
-                    raw=part[key][:][mask]
-                    print(f'key: {key}, shape: {raw.shape}')
-                    print(raw)
-                    
                     if key in part.keys():
                         particle_data[ptype][key] = part[key][:][mask]*self.conversions[key]
                         if len(particle_data[ptype][key].shape)==2 and particle_data[ptype][key].shape[1] == 3:
