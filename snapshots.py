@@ -523,6 +523,10 @@ class gadget_cosmo_snapshot_hki:
                 #iterate over the requested keys
                 for key in keys:
                     #if the key is available directly from file, get the data and apply the conversion
+                    raw=part[key][:][mask]
+                    print(f'key: {key}, shape: {raw.shape}')
+                    print(raw)
+                    
                     if key in part.keys():
                         particle_data[ptype][key] = part[key][:][mask]*self.conversions[key]
                         if len(particle_data[ptype][key].shape)==2 and particle_data[ptype][key].shape[1] == 3:
@@ -533,17 +537,14 @@ class gadget_cosmo_snapshot_hki:
                         elif len(particle_data[ptype][key].shape)==2:
                             del particle_data[ptype][key]
                             particle_data[ptype][key+f'_{str(0).zfill(2)}'] = part[key][:][mask][:,0][::subsample]*self.conversions[key]
-                    if key == 'Masses' and ptype == 1:
-                        print('DM mass: ', f"{self.mass_dm:.3e} Msun")
-                        particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
-
-
+                    
                     #if the key is a derived field, get the data and apply the conversion
                     elif key in self.derived_fields_available and ptype == self.derived_fields_ptype[key]:
                         particle_data[ptype][key] = self.get_derived_field(key, ptype)[mask][::subsample]
 
                     #if the key is not available for this type, fill with NaNs
                     else:
+                        print(f'Error: key {key} not found for particle type', ptype)
                         particle_data[ptype][key]=np.zeros(num_particles)[::subsample]+np.nan
                 
                 #add a column for the particle type
