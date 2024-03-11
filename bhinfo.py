@@ -198,8 +198,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         if simulation.snapshot_type=='cosmo':
             bhdata_ibh['scalefac']=bhdata_ibh['Time'].values
             redshifts=1/bhdata_ibh['scalefac'].values-1
-            print(redshifts)
-            bhdata_ibh['Time']=np.array([simulation.cosmology.age(redshift).value for redshift in redshifts])
+            bhdata_ibh['Time']=simulation.cosmology.age(redshifts).value
 
         #add to the output
         bhdata[bhid]=bhdata_ibh
