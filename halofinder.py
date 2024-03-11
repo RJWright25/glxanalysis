@@ -92,7 +92,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
     columns=['Time','isnap','ID','x','y','z','xminpot','yminpot','zminpot','vx','vy','vz',f'Halo_M_Crit{delta}',f'Halo_R_Crit{delta}']
     
     #initialize the dataframe with the number of BHs
-    bhlocs=snapshot.get_particle_data(keys=['Coordinates','Masses','ParticleIDs'],types=5)
+    bhlocs=snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','ParticleIDs'],types=5)
     bhlocs.sort_values(by='ParticleIDs',ascending=True,inplace=True)
     bhlocs.reset_index(drop=True,inplace=True)
     numbh=bhlocs.shape[0]
@@ -113,7 +113,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         halo_output['z'][ibh]=ibh_row['Coordinates_z']
 
         #find star particles within 2 kpc of the bh
-        centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=1,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)
+        centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=4,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)
         #if no potential data, use the bh location
         if np.isfinite(centralstar['Potential'].values[0]):
             #find the 1000 star particles with the lowest potential energy using a boolean mask
@@ -124,6 +124,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
             #find the average velocity of these particles weighted by their mass
             velcop = np.average(centralstar.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
         else:
+            print('No potential data found for star particles. Using BH location as halo minpot.')
             poscop = np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])
             velcop = np.array([ibh_row['Velocities_x'],ibh_row['Velocities_y'],ibh_row['Velocities_z']])
 
@@ -156,9 +157,9 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         sorted_radius=radius[sorted_radius];sorted_volume=4/3*np.pi*(sorted_radius)**3
         sorted_cumdens=sorted_cummass/(sorted_volume)
 
-        # print(pdata_m200)
-        # print(sorted_radius)
-        # print(sorted_cummass)
+        print(pdata_m200)
+        print(sorted_radius)
+        print(sorted_cummass)
 
         iradius=len(sorted_cumdens)-np.searchsorted(sorted_cumdens[::-1],critdens)
     
