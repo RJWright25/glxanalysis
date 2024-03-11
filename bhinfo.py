@@ -177,10 +177,11 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         fpath=path+f'/BH_{str(int(bhid))}.txt'
         bhdata_ibh=pd.DataFrame(np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float))
         bhdata_ibh.dropna(axis=1,how='all',inplace=True)
-        #assign columns
-        print('BH data before assigning columns:')
+        print('BH data after reading:')
         print(bhdata_ibh)
-        bhdata_ibh=pd.DataFrame(bhdata_ibh,columns=columns)
+
+        #assign columns
+        bhdata_ibh.columns=columns
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
         print('BH data after assigning columns:')
         print(bhdata_ibh)
