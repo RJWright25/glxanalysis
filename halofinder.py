@@ -117,7 +117,12 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         #if no potential data, use the bh location
         potential=centralstar['Potential'].values
         starspresent=potential.shape[0]
-        potentialpresent=np.isfinite(potential[0])
+        
+        if starspresent:
+            potentialpresent=np.isfinite(potential[0])
+        else:
+            potentialpresent=False
+            
         if starspresent and potentialpresent:
             #find the 1000 star particles with the lowest potential energy using a boolean mask
             centralstar.sort_values(by='Potential',ascending=True,inplace=True);centralstar.reset_index(drop=True,inplace=True)
