@@ -131,7 +131,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
             poscop = np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])
             #select DM particles within 2 kpc of the BH
             centraldm = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses'],types=1,center=poscop*apy_units.kpc,radius=2*apy_units.kpc)
-            velcop = np.average(centraldm.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
+            velcop = np.average(centraldm.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centraldm['Masses'].values,axis=0)
 
         #save the positions and velocities
         halo_output['xminpot'][ibh]=(poscop[0])
