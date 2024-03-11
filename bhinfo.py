@@ -178,8 +178,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         bhdata_ibh=pd.DataFrame(np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float))
         bhdata_ibh.dropna(axis=1,how='all',inplace=True)
         #assign columns
-        
-
+        print(bhdata_ibh)
         bhdata_ibh=pd.DataFrame(bhdata_ibh,columns=columns)
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
 
