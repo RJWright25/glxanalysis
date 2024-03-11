@@ -159,15 +159,13 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         sorted_radius=radius[sorted_radius];sorted_volume=4/3*np.pi*(sorted_radius)**3
         sorted_cumdens=sorted_cummass/(sorted_volume)
 
-        print(pdata_m200)
-        print(sorted_radius)
-        print(sorted_cummass)
-
         iradius=len(sorted_cumdens)-np.searchsorted(sorted_cumdens[::-1],critdens)
     
         #save the mass and radius
         halo_output[f'Halo_M_Crit{delta}'][ibh]=sorted_cummass[iradius]
         halo_output[f'Halo_R_Crit{delta}'][ibh]=sorted_radius[iradius]
+
+        print(f'Halo {bhlocs["ParticleIDs"].values[ibh]} found with mass = {halo_output[f"Halo_M_Crit{delta}"][ibh]:.2e} Msun and radius = {halo_output[f"Halo_R_Crit{delta}"][ibh]:.2f} kpc.')
 
     locked_print(f'----> Halo finding complete for {snapshot.snapshot_file.split("/")[-1]} in {time.time()-t0:.2f} seconds.')
     if verbose:
