@@ -113,14 +113,19 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         halo_output['z'][ibh]=ibh_row['Coordinates_z']
 
         #find star particles within 2 kpc of the bh
-        centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=4,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)
-        #find the 1000 star particles with the lowest potential energy using a boolean mask
-        centralstar.sort_values(by='Potential',ascending=True,inplace=True);centralstar.reset_index(drop=True,inplace=True)
-        centralstar = centralstar.iloc[:1000];centralstar.reset_index(drop=True,inplace=True)
-        #find the center of potential of these particles weighted by their mass
-        poscop = np.average(centralstar.loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values,weights=centralstar['Masses'].values,axis=0)
-        #find the average velocity of these particles weighted by their mass
-        velcop = np.average(centralstar.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
+        centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=1,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)
+        #if no potential data, use the bh location
+        if np.isfinite(centralstar['Potential'].values[0]):
+            #find the 1000 star particles with the lowest potential energy using a boolean mask
+            centralstar.sort_values(by='Potential',ascending=True,inplace=True);centralstar.reset_index(drop=True,inplace=True)
+            centralstar = centralstar.iloc[:1000];centralstar.reset_index(drop=True,inplace=True)
+            #find the center of potential of these particles weighted by their mass
+            poscop = np.average(centralstar.loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values,weights=centralstar['Masses'].values,axis=0)
+            #find the average velocity of these particles weighted by their mass
+            velcop = np.average(centralstar.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
+        else:
+            poscop = np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])
+            velcop = np.array([ibh_row['Velocities_x'],ibh_row['Velocities_y'],ibh_row['Velocities_z']])
 
         #save the positions and velocities
         halo_output['xminpot'][ibh]=(poscop[0])

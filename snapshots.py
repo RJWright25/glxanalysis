@@ -538,6 +538,10 @@ class gadget_cosmo_snapshot_hki:
                     elif key in self.derived_fields_available and ptype == self.derived_fields_ptype[key]:
                         particle_data[ptype][key] = self.get_derived_field(key, ptype)[mask][::subsample]
 
+                    #if key is Masses and ptype is 1, return the mass_dm
+                    elif key == 'Masses' and ptype == 1:
+                        particle_data[ptype][key] = np.ones(num_particles)[::subsample]*self.mass_dm
+
                     #if the key is not available for this type, fill with NaNs
                     else:
                         print(f'Error: key {key} not found for particle type', ptype)
