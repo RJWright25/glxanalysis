@@ -127,7 +127,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
             print('No potential data found for star particles. Using BH location as halo minpot.')
             poscop = np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])
             #select star particles within 2 kpc of the BH
-            centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses'],types=4,center=poscop,radius=2*apy_units.kpc)
+            centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses'],types=4,center=poscop*apy_units.kpc,radius=2*apy_units.kpc)
             velcop = np.average(centralstar.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
 
         #save the positions and velocities
