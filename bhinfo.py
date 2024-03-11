@@ -177,14 +177,10 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         fpath=path+f'/BH_{str(int(bhid))}.txt'
         bhdata_ibh=pd.DataFrame(np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float))
         bhdata_ibh.dropna(axis=1,how='all',inplace=True)
-        print('BH data after reading:')
-        print(bhdata_ibh)
 
         #assign columns
         bhdata_ibh.columns=columns
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
-        print('BH data after assigning columns:')
-        print(bhdata_ibh)
 
         #if cosmo, convert afac to time
         if simulation.snapshot_type=='cosmo':
@@ -195,8 +191,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         bhdata_ibh['bh_Mdot']=bhdata_ibh['bh_Mdot']#don't think this needs to be converted
         for key in [f'Coordinates_{x}' for x in 'xyz']:
             bhdata_ibh[key]=bhdata_ibh[key]/simulation.hubble
-        print('BH data after unit conversion:')
-        print(bhdata_ibh)
+
 
         #now add closest snap index from the main simulation to the BH data
         bhdata_ibh['isnap']=np.zeros(bhdata_ibh.shape[0])
@@ -210,6 +205,8 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
 
         #add to the output
         bhdata[bhid]=bhdata_ibh
-    
+        
+        print('BH data after unit conversion:')
+        print(bhdata_ibh)
     return bhdata
 
