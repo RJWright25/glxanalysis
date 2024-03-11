@@ -198,12 +198,15 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         print('BH data after unit conversion:')
         print(bhdata_ibh)
 
-        
-
         #now add closest snap index from the main simulation to the BH data
         bhdata_ibh['isnap']=np.zeros(bhdata_ibh.shape[0])
         for isnap,snapshot in enumerate(simulation.snapshots):
             bhdata_ibh.loc[bhdata_ibh['Time'].values>=snapshot.time,'isnap']=isnap
+
+        #if cosmo sim, convert to universe age 
+        if simulation.snapshot_type=='cosmo':
+            bhdata_ibh['scalefac']=bhdata_ibh['Time'].values
+            bhdata_ibh['Time']=simulation.cosmology.age(1/bhdata_ibh['scalefac'].values-1).value
 
         #add to the output
         bhdata[bhid]=bhdata_ibh
