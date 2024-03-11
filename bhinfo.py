@@ -182,10 +182,6 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         bhdata_ibh.columns=columns
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
 
-        #if cosmo, convert afac to time
-        if simulation.snapshot_type=='cosmo':
-            bhdata_ibh['Time']=simulation.cosmology.age(1/bhdata_ibh['Time'].values-1).value
-
         #convert to physical units
         bhdata_ibh['bh_M']=bhdata_ibh['bh_M']*1e10/simulation.hubble
         bhdata_ibh['bh_Mdot']=bhdata_ibh['bh_Mdot']#don't think this needs to be converted
@@ -202,6 +198,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         if simulation.snapshot_type=='cosmo':
             bhdata_ibh['scalefac']=bhdata_ibh['Time'].values
             redshifts=1/bhdata_ibh['scalefac'].values-1
+            print(redshifts)
             bhdata_ibh['Time']=np.array([simulation.cosmology.age(redshift).value for redshift in redshifts])
 
         #add to the output
