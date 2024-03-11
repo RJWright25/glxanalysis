@@ -115,7 +115,10 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         #find star particles within 2 kpc of the bh
         centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=4,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)
         #if no potential data, use the bh location
-        if np.isfinite(centralstar['Potential'].values[0]):
+        potential=centralstar['Potential'].values
+        starspresent=potential.shape[0]
+        potentialpresent=np.isfinite(potential[0])
+        if starspresent and potentialpresent:
             #find the 1000 star particles with the lowest potential energy using a boolean mask
             centralstar.sort_values(by='Potential',ascending=True,inplace=True);centralstar.reset_index(drop=True,inplace=True)
             centralstar = centralstar.iloc[:1000];centralstar.reset_index(drop=True,inplace=True)
@@ -126,9 +129,9 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         else:
             print('No potential data found for star particles. Using BH location as halo minpot.')
             poscop = np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])
-            #select star particles within 2 kpc of the BH
-            centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses'],types=4,center=poscop*apy_units.kpc,radius=2*apy_units.kpc)
-            velcop = np.average(centralstar.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
+            #select DM particles within 2 kpc of the BH
+            centraldm = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses'],types=1,center=poscop*apy_units.kpc,radius=2*apy_units.kpc)
+            velcop = np.average(centraldm.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centralstar['Masses'].values,axis=0)
 
         #save the positions and velocities
         halo_output['xminpot'][ibh]=(poscop[0])
