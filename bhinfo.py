@@ -162,7 +162,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
 
     #columns
     fpath=path+f'/BH_{str(int(bhids[0]))}.txt'
-    bhdata_ibh=np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float)
+    bhdata_ibh=pd.DataFrame(np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float))
     bhdata_ibh.dropna(axis=1,how='all',inplace=True)
     numcol=bhdata_ibh.shape[-1]
     columns=np.array(['Time','bh_M','bh_Mdot','rho','cs','gas_Vrel_tot','Coordinates_x','Coordinates_y','Coordinates_z','V_x','V_y','V_z','gas_Vrel_x','gas_Vrel_y','gas_Vrel_z','Flag_binary','companion_ID','bh_hsml'])
@@ -175,7 +175,10 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
     for bhid in bhids:
         print(f'Reading black hole details for BHID = {bhid}...')
         fpath=path+f'/BH_{str(int(bhid))}.txt'
-        bhdata_ibh=np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float)
+        bhdata_ibh=pd.DataFrame(np.loadtxt(fpath,dtype=str)[::subsample,1:].astype(float))
+        bhdata_ibh.dropna(axis=1,how='all',inplace=True)
+        #assign columns
+        
 
         bhdata_ibh=pd.DataFrame(bhdata_ibh,columns=columns)
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
