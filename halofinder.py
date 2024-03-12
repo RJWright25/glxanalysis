@@ -140,7 +140,8 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
             if centraldm.shape[0]==0:
                 print('No DM particles found within 2 kpc of the BH. Using BH velocity as halo vel.')
                 velcop = np.array([ibh_row['Velocities_x'],ibh_row['Velocities_y'],ibh_row['Velocities_z']])
-            velcop = np.average(centraldm.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centraldm['Masses'].values,axis=0)
+            else:
+                velcop = np.average(centraldm.loc[:,['Velocities_x','Velocities_y','Velocities_z']].values,weights=centraldm['Masses'].values,axis=0)
 
         #save the positions and velocities
         halo_output['xminpot'][ibh]=(poscop[0])
