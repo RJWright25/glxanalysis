@@ -470,7 +470,7 @@ class gadget_cosmo_snapshot_hki:
         return mask
     
     #method to get requested field of particle data (and type) in physical units. return pandas dataframs with the requested field(s) in physical units with a field for the particle type. dynamically allocate memory for the dataframes to avoid memory issues. 
-    def get_particle_data(self, keys=None, types=None, center=None, radius=None,subsample=1):
+    def get_particle_data(self, keys=None, types=None, center=None, radius=None,subsample=1,verbose=False):
 
         """
         Returns the requested particle data in physical units.
@@ -544,7 +544,8 @@ class gadget_cosmo_snapshot_hki:
 
                     #if the key is not available for this type, fill with NaNs
                     else:
-                        print(f'Error: key {key} not found for particle type', ptype)
+                        if verbose:
+                            print(f'Error: key {key} not found for particle type', ptype)
                         particle_data[ptype][key]=np.zeros(num_particles)[::subsample]+np.nan
                 
                 #add a column for the particle type
