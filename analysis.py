@@ -25,7 +25,7 @@ import astropy.constants as apy_const
 from .tools import locked_print
 
 # This function is used to calculate the properties of a galaxy in a snapshot, given the properties of the halo.
-def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=False,verbose=True):
+def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=True):
 
     """
     Calculate the properties of a galaxy in a snapshot, given the properties of the halo.
@@ -396,7 +396,7 @@ def group_galaxies(galaxies,verbose=False):
 
 
 # This function is used to analyse several galaxies in a snapshot when using multiprocessing.
-def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=False):
+def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=False):
     
     """
     Analyse galaxies in several snapshots, for use with multiprocessing.
@@ -426,7 +426,7 @@ def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,
     isnap_outputs=[]
     #loop over the snapshots
     for snapshot in snaplist:
-        isnap_gals=galaxy_analysis(snapshot=snapshot,haloes=haloes,shells_kpc=shells_kpc,useminpot=useminpot,rfac_offset=rfac_offset,verbose=verbose)
+        isnap_gals=galaxy_analysis(snapshot=snapshot,haloes=haloes,shells_kpc=shells_kpc,useminpot=useminpot,rfac_offset=rfac_offset,grouper=grouper,verbose=verbose)
         isnap_outputs.append(isnap_gals)
     
     #concatenate the outputs

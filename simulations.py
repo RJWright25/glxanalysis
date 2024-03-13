@@ -246,7 +246,7 @@ class gadget_simulation:
         return haloes
         
     # Method to analyse galaxies in all snapshots using multiprocessing
-    def analyse_galaxies(self,numproc=1,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=False):
+    def analyse_galaxies(self,numproc=1,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=False):
         """
         
         Analyse galaxies in all snapshots using multiprocessing.
@@ -300,7 +300,7 @@ class gadget_simulation:
             snapshots_ichunk=snapshot_chunks[iproc]
             if verbose:
                 print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])
-            proc = multiprocessing.Process(target=stack_galaxies_worker, args=(snapshots_ichunk,haloes,iproc,shells_kpc,useminpot,rfac_offset,verbose))
+            proc = multiprocessing.Process(target=stack_galaxies_worker, args=(snapshots_ichunk,haloes,iproc,shells_kpc,useminpot,rfac_offset,grouper,verbose))
             procs.append(proc)
             proc.start()
 
