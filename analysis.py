@@ -344,9 +344,9 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
     else:
         print(f'No galaxies found in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
         galaxies=pd.DataFrame()
-        
+    
     #"grouper" analyses the galaxies to find potential groups and remnants
-    if grouper and galaxies.shape[0]:
+    if grouper and galaxies.shape[0]>1:
         galaxies=group_galaxies(galaxies,verbose=verbose)
 
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
