@@ -89,7 +89,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
     cosmo=snapshot.cosmology
 
     #create a pandas dataframe to store the halo properties
-    columns=['Time','isnap','ID','x','y','z','xminpot','yminpot','zminpot','vx','vy','vz',f'Halo_M_Crit{delta}',f'Halo_R_Crit{delta}']
+    columns=['Time','isnap','ID','x','y','z','BH_Mass','xminpot','yminpot','zminpot','vx','vy','vz',f'Halo_M_Crit{delta}',f'Halo_R_Crit{delta}']
     
     #initialize the dataframe with the number of BHs
     bhlocs=snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','ParticleIDs'],types=5)
