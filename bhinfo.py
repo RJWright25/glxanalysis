@@ -203,7 +203,5 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         #add to the output
         bhdata[bhid]=bhdata_ibh
         
-        print('BH data after unit conversion:')
-        print(bhdata_ibh)
     return bhdata
 

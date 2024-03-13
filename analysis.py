@@ -338,11 +338,15 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             continue
 
     #concatenate the outputs for each halo
-    galaxies=pd.concat(galaxy_output_all)
-    galaxies.reset_index(drop=True,inplace=True)
-
+    if galaxy_output_all:
+        galaxies=pd.concat(galaxy_output_all)
+        galaxies.reset_index(drop=True,inplace=True)
+    else:
+        print(f'No galaxies found in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
+        galaxies=pd.DataFrame()
+        
     #"grouper" analyses the galaxies to find potential groups and remnants
-    if grouper:
+    if grouper and galaxies.shape[0]:
         galaxies=group_galaxies(galaxies,verbose=verbose)
 
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
@@ -350,7 +354,6 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
         print()
 
     return galaxies
-
 
 def group_galaxies(galaxies,verbose=False):
 
