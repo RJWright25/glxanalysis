@@ -111,6 +111,8 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
         halo_output['x'][ibh]=ibh_row['Coordinates_x']
         halo_output['y'][ibh]=ibh_row['Coordinates_y']
         halo_output['z'][ibh]=ibh_row['Coordinates_z']
+        halo_output['BH_Mass'][ibh]=ibh_row['Masses']
+        
 
         #find star particles within 2 kpc of the bh
         centralstar = snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','Potential'],types=4,center=np.array([ibh_row['Coordinates_x'],ibh_row['Coordinates_y'],ibh_row['Coordinates_z']])*snapshot.units["Coordinates"],radius=2*apy_units.kpc)

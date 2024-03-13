@@ -101,6 +101,7 @@ class gadget_idealised_snapshot_hki:
             self.Om0=snapshot['Header'].attrs['Omega0']
             self.hubble=snapshot['Header'].attrs['HubbleParam']
             self.cosmology = apy_cosmo.FlatLambdaCDM(H0=self.hubble*100, Om0=self.Om0)
+            self.mass_dm=None
             self.XH=0.76
             self.XHe=0.24
         snapshot.close()

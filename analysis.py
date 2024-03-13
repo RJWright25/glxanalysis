@@ -25,7 +25,7 @@ import astropy.constants as apy_const
 from .tools import locked_print
 
 # This function is used to calculate the properties of a galaxy in a snapshot, given the properties of the halo.
-def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=True):
+def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=False,verbose=True):
 
     """
     Calculate the properties of a galaxy in a snapshot, given the properties of the halo.
@@ -330,11 +330,70 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
     galaxies=pd.concat(galaxy_output_all)
     galaxies.reset_index(drop=True,inplace=True)
 
+    #"grouper" analyses the galaxies to find potential groups and remnants
+    if grouper:
+        galaxies=grouper(galaxies,verbose=verbose)
+
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
     if verbose:
         print()
 
     return galaxies
+
+
+def group_galaxies(galaxies,verbose=False):
+
+    #initialise the output
+    galaxies.loc[:,'GroupID']=-1
+    galaxies.loc[:,'Central']=1
+    galaxies.loc[:,'iremnant']=0
+
+
+    #loop over the galaxies -- find whether any other haloes overlap their R200c
+    for igal,gal in galaxies.iterrows():
+        if verbose:
+            print(f'Checking galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})...')
+        #check if the galaxy is already in a group
+        if gal['GroupID']!=-1:continue
+
+        #check if any other galaxies overlap the R200c
+        mask=galaxies['Halo_R_Crit200'].values>np.sqrt((galaxies['x'].values-gal['x'])**2+(galaxies['y'].values-gal['y'])**2+(galaxies['z'].values-gal['z'])**2)
+        
+        #if so, assign them to the same group
+        galaxies.loc[mask,'GroupID']=igal
+
+        #if there are multiple galaxies in the group, find the central as the one with the most stellar mass within restar
+        if np.sum(mask)>1:
+            galaxies.loc[mask,'Central']=0
+            central_idx=np.argmax(galaxies.loc[mask,'restar_sphere_star_tot'].values)
+            if verbose:
+                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is in a group with {np.sum(mask)} other galaxies. Central is {int(galaxies.loc[mask].iloc[central_idx]["ID"])}, with mass .')
+            galaxies.loc[np.where(mask)[0][central_idx],'Central']=1
+
+        #identify potential remnants as the BHs within 10 kpc of the central and similar m200/mstar
+        #set "iremnant" to 1 for galaxies with the less massive BH
+        if galaxies.loc[igal,'Central']:
+            mask=galaxies['Central'].values==0
+            m200diff=np.abs(np.log10(galaxies.loc[mask,'Halo_M_Crit200'].values/galaxies.loc[igal,'Halo_M_Crit200']))
+            mstardiff=np.abs(np.log10(galaxies.loc[mask,'restar_sphere_star_tot'].values/galaxies.loc[igal,'restar_sphere_star_tot']))
+            distance=np.sqrt((galaxies.loc[mask,'x'].values-galaxies.loc[igal,'x'])**2+(galaxies.loc[mask,'y'].values-galaxies.loc[igal,'y'])**2+(galaxies.loc[mask,'z'].values-galaxies.loc[igal,'z'])**2)
+            mask=np.logical_and.reduce([m200diff<0.2,mstardiff<0.2,distance<10])
+            bhmasses=galaxies.loc[mask,'BH_Mass'].values
+            if np.sum(mask):
+                if np.max(bhmasses)<galaxies.loc[igal,'BH_Mass']:
+                    galaxies.loc[igal,'iremnant']=1
+                    if verbose:
+                        print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the more massive galaxy in a potential remnant pair.')
+            else:
+                if verbose:
+                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a potential remnant pair.')
+
+        
+            
+
+    return galaxies
+            
+
 
 # This function is used to analyse several galaxies in a snapshot when using multiprocessing.
 def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=False):

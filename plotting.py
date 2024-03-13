@@ -276,16 +276,23 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,useminpot=False
         print('Type not recognized. Options are "baryons" and "dm".')
         return
 
-    if not frame:
-        frame=snapshot.boxsize/2
+
 
     censtr=''
     if useminpot:censtr='minpot'
 
     pdata=snapshot.get_particle_data(keys=['Coordinates','Masses'], types=ptypes, center=None, radius=None,subsample=subsample)
+
+    #find frame based on particle positions
+    if not frame:
+        weighted_center_allpart=np.sum(pdata.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values*pdata['Masses'].values[:,np.newaxis],axis=0)/np.sum(pdata['Masses'].values)
+        frame=np.nanmax(np.abs(pdata.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values-weighted_center_allpart))
+
+        
     sph_fluidmask=pdata['ParticleTypes'].values==ptypes[0]
     sph_particles=sphviewer.Particles(pdata.loc[sph_fluidmask,[f'Coordinates_{x}' for x in 'xyz']].values,
                                       pdata.loc[sph_fluidmask,'Masses'].values,nb=8)
+    
     sph_camera = sphviewer.Camera(r='infinity', t=0, p=0, roll=0, xsize=1500, ysize=1500,
                                                 x=0, y=0, z=0,
                                                 extent=[-frame,frame,-frame,frame])
@@ -313,8 +320,8 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,useminpot=False
             ax.scatter(gal[f'x{censtr}'],gal[f'y{censtr}'],s=1,c='k',zorder=2)
             ax.add_artist(plt.Circle(radius=gal[radstr],xy=[gal[f'x{censtr}'],gal[f'y{censtr}']],color='w',lw=0.5,ls='--',fill=False,zorder=2))
     
-    ax.set_xlim(-frame,frame)
-    ax.set_ylim(-frame,frame)
+    ax.set_xlim(weighted_center_allpart-frame,weighted_center_allpart+frame)
+    ax.set_ylim(weighted_center_allpart-frame,weighted_center_allpart+frame)
 
     ax.text(0.55,0.01,'$x$ [kpc]',transform=fig.transFigure,ha='center',va='bottom')
     ax.text(0.01,0.55,'$y$ [kpc]',transform=fig.transFigure,ha='left',va='center',rotation=90)
