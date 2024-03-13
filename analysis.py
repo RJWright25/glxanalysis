@@ -200,7 +200,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
                 galaxy_output[f're{phasestr}_sphere']= iradii[np.searchsorted(cummass,0.5*cummass[-1])]
                 doanalysis=True
             else:
-                print(f'No {phasestr} particles found in galaxy {halo["ID"]}')
+                print(f'No {phasestr} particles found in galaxy {int(halo["ID"])}')
                 doanalysis=False
                 galaxy_output[f're{phasestr}_sphere']=np.nan
                 
@@ -327,11 +327,13 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             for column in galaxy_output:
                 galaxy_output[column]=np.float64(galaxy_output[column])
 
-
             galaxy_output=pd.Series(galaxy_output).to_frame().T
             galaxy_output_all.append(galaxy_output)
+
         else:
-            locked_print(f'----> No particles found in galaxy {halo["ID"]}.')
+            if verbose:
+                print(f'No baryonic particles to analyse in galaxy {int(halo["ID"])}.')
+
             galaxy_output_all.append(pd.Series(halo).to_frame().T)
             continue
 
@@ -341,7 +343,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
 
     #"grouper" analyses the galaxies to find potential groups and remnants
     if grouper:
-        galaxies=grouper(galaxies,verbose=verbose)
+        galaxies=group_galaxies(galaxies,verbose=verbose)
 
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
     if verbose:
@@ -357,11 +359,10 @@ def group_galaxies(galaxies,verbose=False):
     galaxies.loc[:,'Central']=1
     galaxies.loc[:,'iremnant']=0
 
-
     #loop over the galaxies -- find whether any other haloes overlap their R200c
     for igal,gal in galaxies.iterrows():
         if verbose:
-            print(f'Checking galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})...')
+            print(f'Post-processing galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})...')
         #check if the galaxy is already in a group
         if gal['GroupID']!=-1:continue
 
@@ -397,8 +398,7 @@ def group_galaxies(galaxies,verbose=False):
                 if verbose:
                     print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a potential remnant pair.')
 
-        
-            
+    
 
     return galaxies
             
