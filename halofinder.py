@@ -171,7 +171,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
             print('Finding virial quantities...')
 
         #get particle data within 1000 kpc of the center and sort by radius
-        pdata_m200=snapshot.get_particle_data(keys=['Coordinates','Masses'],types=[1],center=center,radius=500*apy_units.kpc)
+        pdata_m200=snapshot.get_particle_data(keys=['Coordinates','Masses'],types=[0,1,4,5],center=center,radius=500*apy_units.kpc)
         radius=pdata_m200['R'].values
 
         sorted_radius=np.argsort(radius)
