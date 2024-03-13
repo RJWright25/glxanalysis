@@ -92,7 +92,12 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
     columns=['Time','isnap','ID','x','y','z','BH_Mass','xminpot','yminpot','zminpot','vx','vy','vz',f'Halo_M_Crit{delta}',f'Halo_R_Crit{delta}']
     
     #initialize the dataframe with the number of BHs
-    bhlocs=snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','ParticleIDs'],types=5)
+    try:
+        bhlocs=snapshot.get_particle_data(keys=['Coordinates','Velocities','Masses','ParticleIDs'],types=5)
+    except:
+        print(f'No BHs found in snapshot {snapshot.snapshot_file}.')
+        return pd.DataFrame(columns=columns)
+    
     bhlocs.sort_values(by='ParticleIDs',ascending=True,inplace=True)
     bhlocs.reset_index(drop=True,inplace=True)
     numbh=bhlocs.shape[0]
