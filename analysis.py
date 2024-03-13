@@ -357,14 +357,18 @@ def group_galaxies(galaxies,verbose=False):
     #initialise the output
     galaxies.loc[:,'GroupID']=-1
     galaxies.loc[:,'Central']=1
-    galaxies.loc[:,'iremnant']=0
+    galaxies.loc[:,'iremnant_flag']=-1
+    galaxies.loc[:,'iremnant_pair']=-1
+    galaxies.loc[:,'iremnant_cen']=-1
 
     #loop over the galaxies -- find whether any other haloes overlap their R200c
+    iremnant=1
     for igal,gal in galaxies.iterrows():
         if verbose:
             print(f'Post-processing galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})...')
+
         #check if the galaxy is already in a group
-        if gal['GroupID']!=-1:continue
+        if gal['GroupID']!=-1:print("This galaxy has already been identified in a group.");continue
 
         #check if any other galaxies overlap the R200c
         mask=galaxies['Halo_R_Crit200'].values>np.sqrt((galaxies['x'].values-gal['x'])**2+(galaxies['y'].values-gal['y'])**2+(galaxies['z'].values-gal['z'])**2)
@@ -375,30 +379,37 @@ def group_galaxies(galaxies,verbose=False):
         #if there are multiple galaxies in the group, find the central as the one with the most stellar mass within restar
         if np.sum(mask)>1:
             galaxies.loc[mask,'Central']=0
-            central_idx=np.argmax(galaxies.loc[mask,'restar_sphere_star_tot'].values)
+            central_idx=np.argmax(galaxies.loc[mask,'1p00restar_sphere_star_tot'].values)
             if verbose:
-                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is in a group with {np.sum(mask)} other galaxies. Central is {int(galaxies.loc[mask].iloc[central_idx]["ID"])}, with mass .')
+                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is in a group with {np.sum(mask)-1} other galaxies. Central is {int(galaxies.loc[mask].iloc[central_idx]["ID"])}, with halo mass {galaxies.loc[mask].iloc[central_idx]["Halo_M_Crit200"]:.2e}')
             galaxies.loc[np.where(mask)[0][central_idx],'Central']=1
+        else:
+            print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a group.')
 
         #identify potential remnants as the BHs within 10 kpc of the central and similar m200/mstar
         #set "iremnant" to 1 for galaxies with the less massive BH
-        if galaxies.loc[igal,'Central']:
-            mask=galaxies['Central'].values==0
-            m200diff=np.abs(np.log10(galaxies.loc[mask,'Halo_M_Crit200'].values/galaxies.loc[igal,'Halo_M_Crit200']))
-            mstardiff=np.abs(np.log10(galaxies.loc[mask,'restar_sphere_star_tot'].values/galaxies.loc[igal,'restar_sphere_star_tot']))
-            distance=np.sqrt((galaxies.loc[mask,'x'].values-galaxies.loc[igal,'x'])**2+(galaxies.loc[mask,'y'].values-galaxies.loc[igal,'y'])**2+(galaxies.loc[mask,'z'].values-galaxies.loc[igal,'z'])**2)
-            mask=np.logical_and.reduce([m200diff<0.2,mstardiff<0.2,distance<10])
-            bhmasses=galaxies.loc[mask,'BH_Mass'].values
-            if np.sum(mask):
-                if np.max(bhmasses)<galaxies.loc[igal,'BH_Mass']:
-                    galaxies.loc[igal,'iremnant']=1
-                    if verbose:
-                        print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the more massive galaxy in a potential remnant pair.')
+        m200diff=np.abs(np.log10(galaxies['Halo_M_Crit200'].values/galaxies.loc[igal,'Halo_M_Crit200']))
+        mstardiff=np.abs(np.log10(galaxies['1p00restar_sphere_star_tot'].values/galaxies.loc[igal,'1p00restar_sphere_star_tot']))
+        distance=np.sqrt((galaxies['x'].values-galaxies.loc[igal,'x'])**2+(galaxies['y'].values-galaxies.loc[igal,'y'])**2+(galaxies['z'].values-galaxies.loc[igal,'z'])**2)
+        mask=np.logical_and.reduce([m200diff<0.2,mstardiff<0.2,distance<2,distance>0])
+        bhmasses=galaxies.loc[mask,'BH_Mass'].values
+        bhids=galaxies.loc[mask,'ID'].values
+
+        if np.sum(mask) and gal['iremnant_flag']==-1:
+            galaxies.loc[igal,'iremnant_flag']=iremnant
+            galaxies.loc[igal,'iremnant_pair']=bhids[0]
+            galaxies.loc[igal,'iremnant_cen']=0
+            if np.max(bhmasses)<galaxies.loc[igal,'BH_Mass']:
+                galaxies.loc[igal,'iremnant_cen']=1
+                if verbose:
+                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the more massive galaxy in a potential remnant pair.')
             else:
                 if verbose:
-                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a potential remnant pair.')
-
-    
+                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the less massive galaxy in a potential remnant pair.')
+            iremnant+=1
+        else:
+            if verbose:
+                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a potential remnant pair.')
 
     return galaxies
             

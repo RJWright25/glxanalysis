@@ -248,7 +248,7 @@ def plot_glxsep(simulation,id1=None,id2=None):
 
     return fig,axes
 
-def render_snap(snapshot,type='baryons',frame=None,galaxies=None,useminpot=False,subsample=1,verbose=False):
+def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),center=None,useminpot=False,subsample=1,verbose=False):
     """
     Render a snapshot of the simulation.
 
@@ -267,28 +267,36 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,useminpot=False
     """
 
     if type=='baryons':
-        ptypes=[0,4];radstr='restar_sphere'
+        ptypes=[0,4];radstr='restar_sphere';rfac=20
         cmap=cmap_gas
+        ls_sphere=':'
     elif type=='dm':
-        ptypes=[1];radstr='Halo_R_Crit200'
+        ptypes=[1];radstr='Halo_R_Crit200';rfac=1
         cmap='viridis'
+        ls_sphere='--'
     else:
         print('Type not recognized. Options are "baryons" and "dm".')
         return
-
-
 
     censtr=''
     if useminpot:censtr='minpot'
 
     pdata=snapshot.get_particle_data(keys=['Coordinates','Masses'], types=ptypes, center=None, radius=None,subsample=subsample)
 
-    #find frame based on particle positions
-    if not frame:
-        weighted_center_allpart=np.sum(pdata.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values*pdata['Masses'].values[:,np.newaxis],axis=0)/np.sum(pdata['Masses'].values)
-        frame=np.nanmax(np.abs(pdata.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values-weighted_center_allpart))
+    #find center based on particle positions
+    if not center:
+        center=np.sum(pdata.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values*pdata['Masses'].values[:,np.newaxis],axis=0)/np.sum(pdata['Masses'].values)
+        pdata['Coordinates_x']-=center[0]
+        pdata['Coordinates_y']-=center[1]
+        pdata['Coordinates_z']-=center[2]
 
-        
+    #find frame and center based on particle positions
+    if not frame:
+        frame=(np.nanmax(pdata['Coordinates_x'].values)-np.nanmin(pdata['Coordinates_x'].values))/2
+        #if cosmo, half this
+        if snapshot.mass_dm>=0:
+            frame/=2
+
     sph_fluidmask=pdata['ParticleTypes'].values==ptypes[0]
     sph_particles=sphviewer.Particles(pdata.loc[sph_fluidmask,[f'Coordinates_{x}' for x in 'xyz']].values,
                                       pdata.loc[sph_fluidmask,'Masses'].values,nb=8)
@@ -313,21 +321,43 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,useminpot=False
         ax.scatter(stars.loc[:,'Coordinates_x'].values,stars.loc[:,'Coordinates_y'].values,c=cname_star,alpha=0.03,s=0.05,lw=0,zorder=2)
 
     #add galaxy positions
-    relevant_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
-    if relevant_galaxies.shape[0]:
-        for igal,gal in relevant_galaxies.iterrows():
-            ax.scatter(gal[f'x{censtr}'],gal[f'y{censtr}'],s=2,c='w',zorder=2)
-            ax.scatter(gal[f'x{censtr}'],gal[f'y{censtr}'],s=1,c='k',zorder=2)
-            ax.add_artist(plt.Circle(radius=gal[radstr],xy=[gal[f'x{censtr}'],gal[f'y{censtr}']],color='w',lw=0.5,ls='--',fill=False,zorder=2))
-    
-    ax.set_xlim(weighted_center_allpart-frame,weighted_center_allpart+frame)
-    ax.set_ylim(weighted_center_allpart-frame,weighted_center_allpart+frame)
+    if galaxies.shape[0]:
+        isnap_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
+        if isnap_galaxies.shape[0]:
+            mstar_mask=isnap_galaxies['1p00restar_sphere_star_tot'].values>=1e8
+            if 'Central' in list(isnap_galaxies.keys()):
+                centrals=np.logical_and.reduce([isnap_galaxies['Central'].values==1,mstar_mask])
+                sats=np.logical_and.reduce([isnap_galaxies['Central'].values==0,mstar_mask])
+                remnants=np.logical_and.reduce([isnap_galaxies['iremnant_cen'].values==1,mstar_mask])
+            else:
+                centrals=mstar_mask
+                sats=np.zeros_like(mstar_mask)
+                remnants=np.zeros_like(mstar_mask)
+
+            if np.nansum(centrals):
+                for igal,gal in isnap_galaxies.loc[centrals,:].iterrows():
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=3)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='k',zorder=3)
+                    ax.add_artist(plt.Circle(radius=gal[radstr]*rfac,xy=[gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1]],color='w',lw=0.5,ls=ls_sphere,fill=False,zorder=3))
+            
+            if np.nansum(sats):
+                for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=2)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='grey',zorder=2)
+
+            if np.nansum(remnants):
+                for ibh,bh in isnap_galaxies.loc[remnants,:].iterrows():
+                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='w',lw=1,ls='-',fill=False,zorder=3))
+                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='red',lw=0.5,ls='-',fill=False,zorder=3))
+        
+    ax.set_xlim(-frame,frame)
+    ax.set_ylim(-frame,frame)
 
     ax.text(0.55,0.01,'$x$ [kpc]',transform=fig.transFigure,ha='center',va='bottom')
     ax.text(0.01,0.55,'$y$ [kpc]',transform=fig.transFigure,ha='left',va='center',rotation=90)
     ax.text(x=0.95,y=0.95,s=r'$t='+f'{snapshot.time:.3f}$ Gyr',transform=ax.transAxes,ha='right',va='top',color='w')
     
-    fig.set_dpi(dpi)
+    fig.set_dpi(400)
 
     return fig,ax
 
