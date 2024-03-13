@@ -34,6 +34,7 @@ from .analysis import *
 from .bhinfo import *
 from .snapshots import *
 from .plotting import *
+from .groupfinder import basic_groupfinder
 
 # Ignore warnings
 import warnings
@@ -77,8 +78,6 @@ class gadget_simulation:
     # Initialize the simulation object, take a list of snapshot files and create a list of snapshot objects
     def __init__(self, snapshot_file_list, snapshot_type=None):
         
-        
-
         if snapshot_type is None:
             snapshot_type = gadget_idealised_snapshot_hki
             self.snapshot_type = 'idealised'
@@ -246,7 +245,7 @@ class gadget_simulation:
         return haloes
         
     # Method to analyse galaxies in all snapshots using multiprocessing
-    def analyse_galaxies(self,numproc=1,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=False):
+    def analyse_galaxies(self,numproc=1,shells_kpc=None,useminpot=False,rfac_offset=0.1,groupfinder=True,verbose=False):
         """
         
         Analyse galaxies in all snapshots using multiprocessing.
@@ -300,7 +299,7 @@ class gadget_simulation:
             snapshots_ichunk=snapshot_chunks[iproc]
             if verbose:
                 print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])
-            proc = multiprocessing.Process(target=stack_galaxies_worker, args=(snapshots_ichunk,haloes,iproc,shells_kpc,useminpot,rfac_offset,grouper,verbose))
+            proc = multiprocessing.Process(target=stack_galaxies_worker, args=(snapshots_ichunk,haloes,iproc,shells_kpc,useminpot,rfac_offset,verbose))
             procs.append(proc)
             proc.start()
 
@@ -317,6 +316,15 @@ class gadget_simulation:
         galaxies=pd.concat(chunk_dfs)
         galaxies.sort_values(by=['Time','ID'],ascending=[True,True],inplace=True)
         galaxies.reset_index(drop=True,inplace=True)
+
+        if groupfinder:
+            print()
+            print('Grouping galaxies...')
+            try:
+                galaxies=basic_groupfinder(galaxies,verbose=verbose)
+            except:
+                print('Error: groupfinder failed.')
+                return None
 
         print()
         print(f'----> Galaxy analysis for {len(self.snapshots)} snaps complete in {time.time()-t0stack:.2f} seconds.')

@@ -25,7 +25,7 @@ import astropy.constants as apy_const
 from .tools import locked_print
 
 # This function is used to calculate the properties of a galaxy in a snapshot, given the properties of the halo.
-def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=True):
+def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=True):
 
     """
     Calculate the properties of a galaxy in a snapshot, given the properties of the halo.
@@ -151,7 +151,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
     
     #deal with the shells
     if shells_kpc is None: 
-        shells_kpc=[] #default shells
+        shells_kpc=[0.01,0.05,0.1,0.5,1] #default shells
     shells_kpc_str=[]
     for ishellkpc in shells_kpc:
         if ishellkpc>=1: shells_kpc_str.append(f'{str(int(ishellkpc)).zfill(3)}kpc')
@@ -188,9 +188,11 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             galaxy_output[column]=halo[column]
 
         #calculate the effective half-mass radius of the stars, gas, etc
-        central=galaxy['R'].values<0.05*halo['Halo_R_Crit200']
+        #select particles within 5ckpc 
+        central=galaxy['R'].values<(5*1/(1+snapshot.redshift))
         gas=galaxy.loc[np.logical_and(maskgas,central),:]
         stars=galaxy.loc[np.logical_and(maskstar,central),:]
+        doanalysis=True
 
         #calculate the effective half-mass radius of the stars and gas 
         for phase,phasestr in zip([gas,stars],['gas','star']):
@@ -198,9 +200,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
                 iradii=phase['R'].values
                 cummass=np.cumsum(phase['Masses'].values)
                 galaxy_output[f're{phasestr}_sphere']= iradii[np.searchsorted(cummass,0.5*cummass[-1])]
-                doanalysis=True
             else:
-                print(f'No {phasestr} particles found in galaxy {int(halo["ID"])}')
                 doanalysis=False
                 galaxy_output[f're{phasestr}_sphere']=np.nan
                 
@@ -345,83 +345,15 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
         print(f'No galaxies found in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
         galaxies=pd.DataFrame()
     
-    #"grouper" analyses the galaxies to find potential groups and remnants
-    if grouper and galaxies.shape[0]>1 and '1p00restar_sphere_star_tot' in galaxies.columns:
-        galaxies=group_galaxies(galaxies,verbose=verbose)
-    elif grouper:
-        print(f'Not enough galaxies to group in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
-
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
     if verbose:
         print()
 
     return galaxies
 
-def group_galaxies(galaxies,verbose=False):
-
-    #initialise the output
-    galaxies.loc[:,'GroupID']=-1
-    galaxies.loc[:,'Central']=1
-    galaxies.loc[:,'iremnant_flag']=-1
-    galaxies.loc[:,'iremnant_pair']=-1
-    galaxies.loc[:,'iremnant_cen']=-1
-
-    #loop over the galaxies -- find whether any other haloes overlap their R200c
-    iremnant=1
-    for igal,gal in galaxies.iterrows():
-        if verbose:
-            print(f'Post-processing galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})...')
-
-        #check if the galaxy is already in a group
-        if gal['GroupID']!=-1:print("This galaxy has already been identified in a group.");continue
-
-        #check if any other galaxies overlap the R200c
-        mask=galaxies['Halo_R_Crit200'].values>np.sqrt((galaxies['x'].values-gal['x'])**2+(galaxies['y'].values-gal['y'])**2+(galaxies['z'].values-gal['z'])**2)
-        
-        #if so, assign them to the same group
-        galaxies.loc[mask,'GroupID']=igal
-
-        #if there are multiple galaxies in the group, find the central as the one with the most stellar mass within restar
-        if np.sum(mask)>1:
-            galaxies.loc[mask,'Central']=0
-            central_idx=np.argmax(galaxies.loc[mask,'1p00restar_sphere_star_tot'].values)
-            if verbose:
-                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is in a group with {np.sum(mask)-1} other galaxies. Central is {int(galaxies.loc[mask].iloc[central_idx]["ID"])}, with halo mass {galaxies.loc[mask].iloc[central_idx]["Halo_M_Crit200"]:.2e}')
-            galaxies.loc[np.where(mask)[0][central_idx],'Central']=1
-        else:
-            print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a group.')
-
-        #identify potential remnants as the BHs within 10 kpc of the central and similar m200/mstar
-        #set "iremnant" to 1 for galaxies with the less massive BH
-        m200diff=np.abs(np.log10(galaxies['Halo_M_Crit200'].values/galaxies.loc[igal,'Halo_M_Crit200']))
-        mstardiff=np.abs(np.log10(galaxies['1p00restar_sphere_star_tot'].values/galaxies.loc[igal,'1p00restar_sphere_star_tot']))
-        distance=np.sqrt((galaxies['x'].values-galaxies.loc[igal,'x'])**2+(galaxies['y'].values-galaxies.loc[igal,'y'])**2+(galaxies['z'].values-galaxies.loc[igal,'z'])**2)
-        mask=np.logical_and.reduce([m200diff<0.2,mstardiff<0.2,distance<2,distance>0])
-        bhmasses=galaxies.loc[mask,'BH_Mass'].values
-        bhids=galaxies.loc[mask,'ID'].values
-
-        if np.sum(mask) and gal['iremnant_flag']==-1:
-            galaxies.loc[igal,'iremnant_flag']=iremnant
-            galaxies.loc[igal,'iremnant_pair']=bhids[0]
-            galaxies.loc[igal,'iremnant_cen']=0
-            if np.max(bhmasses)<galaxies.loc[igal,'BH_Mass']:
-                galaxies.loc[igal,'iremnant_cen']=1
-                if verbose:
-                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the more massive galaxy in a potential remnant pair.')
-            else:
-                if verbose:
-                    print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is the less massive galaxy in a potential remnant pair.')
-            iremnant+=1
-        else:
-            if verbose:
-                print(f'Galaxy {igal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])}) is not in a potential remnant pair.')
-
-    return galaxies
-            
-
 
 # This function is used to analyse several galaxies in a snapshot when using multiprocessing.
-def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,rfac_offset=0.1,grouper=True,verbose=False):
+def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=False):
     
     """
     Analyse galaxies in several snapshots, for use with multiprocessing.
@@ -451,7 +383,7 @@ def stack_galaxies_worker(snaplist,haloes,iproc,shells_kpc=None,useminpot=False,
     isnap_outputs=[]
     #loop over the snapshots
     for snapshot in snaplist:
-        isnap_gals=galaxy_analysis(snapshot=snapshot,haloes=haloes,shells_kpc=shells_kpc,useminpot=useminpot,rfac_offset=rfac_offset,grouper=grouper,verbose=verbose)
+        isnap_gals=galaxy_analysis(snapshot=snapshot,haloes=haloes,shells_kpc=shells_kpc,useminpot=useminpot,rfac_offset=rfac_offset,verbose=verbose)
         isnap_outputs.append(isnap_gals)
     
     #concatenate the outputs
