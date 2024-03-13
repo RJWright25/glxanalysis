@@ -273,7 +273,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             shell_gas_mass=masses[shell_gas_mask]
 
             minrad=galaxy['R'].values[minrad_idx]
-            maxrad=galaxy['R'].values[maxrad_idx]
+            maxrad=galaxy['R'].values[maxrad_idx-1]
             dA=4*np.pi*(maxrad**2-minrad**2)
 
             if shell_stars.shape[0]:
