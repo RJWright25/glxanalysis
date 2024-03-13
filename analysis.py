@@ -198,133 +198,142 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
                 iradii=phase['R'].values
                 cummass=np.cumsum(phase['Masses'].values)
                 galaxy_output[f're{phasestr}_sphere']= iradii[np.searchsorted(cummass,0.5*cummass[-1])]
+                doanalysis=True
             else:
                 print(f'No {phasestr} particles found in galaxy {halo["ID"]}')
+                doanalysis=False
                 galaxy_output[f're{phasestr}_sphere']=np.nan
                 
-        #fix coordinates with halo
-        galaxy['Coordinates_xrel']=galaxy['Coordinates_x'].values-center[0].value
-        galaxy['Coordinates_yrel']=galaxy['Coordinates_y'].values-center[1].value
-        galaxy['Coordinates_zrel']=galaxy['Coordinates_z'].values-center[2].value
+        if doanalysis:
+            if verbose:
+                print(f'Effective half-mass radii of stars and gas calculated for galaxy {halo["ID"]}.')
+            #fix coordinates with halo
+            galaxy['Coordinates_xrel']=galaxy['Coordinates_x'].values-center[0].value
+            galaxy['Coordinates_yrel']=galaxy['Coordinates_y'].values-center[1].value
+            galaxy['Coordinates_zrel']=galaxy['Coordinates_z'].values-center[2].value
 
-        #fix the vrad using halo com
-        halo_vcom=halo[['vx','vy','vz']].values
-        galaxy['Velocities_x']-=halo_vcom[0];galaxy['Velocities_y']-=halo_vcom[1];galaxy['Velocities_z']-=halo_vcom[2]
+            #fix the vrad using halo com
+            halo_vcom=halo[['vx','vy','vz']].values
+            galaxy['Velocities_x']-=halo_vcom[0];galaxy['Velocities_y']-=halo_vcom[1];galaxy['Velocities_z']-=halo_vcom[2]
 
-        #find radial velocity
-        galaxy['Velocities_r']=np.sum(galaxy.loc[:,[f'Velocities_{x}' for x in 'xyz']].values*galaxy.loc[:,[f'Coordinates_{x}rel' for x in 'xyz']].values,axis=1)/(np.sqrt(np.sum(galaxy.loc[:,[f'Coordinates_{x}rel' for x in 'xyz']].values**2,axis=1)))
-        vrad=galaxy['Velocities_r'].values*apy_units.km/apy_units.s
-        vrad_flow=vrad.to('kpc/yr')
-        vrad_mask=vrad.to('km/s')
-        v200=np.sqrt(2*halo['Halo_M_Crit200']*apy_units.Msun*(apy_const.G.to('kpc**3 yr**-2 Msun**-1'))/(halo['Halo_R_Crit200']*apy_units.kpc)).to('km/s')
+            #find radial velocity
+            galaxy['Velocities_r']=np.sum(galaxy.loc[:,[f'Velocities_{x}' for x in 'xyz']].values*galaxy.loc[:,[f'Coordinates_{x}rel' for x in 'xyz']].values,axis=1)/(np.sqrt(np.sum(galaxy.loc[:,[f'Coordinates_{x}rel' for x in 'xyz']].values**2,axis=1)))
+            vrad=galaxy['Velocities_r'].values*apy_units.km/apy_units.s
+            vrad_flow=vrad.to('kpc/yr')
+            vrad_mask=vrad.to('km/s')
+            v200=np.sqrt(2*halo['Halo_M_Crit200']*apy_units.Msun*(apy_const.G.to('kpc**3 yr**-2 Msun**-1'))/(halo['Halo_R_Crit200']*apy_units.kpc)).to('km/s')
 
-        #deal with the shells
-        shells_R200={'0p10r200':0.1*halo['Halo_R_Crit200'],'1p00r200':1*halo['Halo_R_Crit200']}
-        shells_restar={'1p00restar':1*galaxy_output['restar_sphere'],'2p00restar':2*galaxy_output['restar_sphere']}
-        shells_all={**shells_R200,**shells_restar,**shells_kpc}
+            #deal with the shells
+            shells_R200={'0p10r200':0.1*halo['Halo_R_Crit200'],'1p00r200':1*halo['Halo_R_Crit200']}
+            shells_restar={'1p00restar':1*galaxy_output['restar_sphere'],'2p00restar':2*galaxy_output['restar_sphere']}
+            shells_all={**shells_R200,**shells_restar,**shells_kpc}
 
-        #calculate the properties of the galaxy within the shells
-        for shell_str,shell_rad in shells_all.items():
-            maxrad_idx=np.searchsorted(radii,shell_rad*(rfac_offset+1))
-            maxrad_mask=np.ones(galaxy.shape[0])
-            maxrad_mask[:maxrad_idx]=0
-            maxrad_mask=maxrad_mask.astype(bool)
-            shell_star_mask=np.logical_and(maskstar,maxrad_mask)
-            shell_gas_mask=np.logical_and(maskgas,maxrad_mask)
-            shell_gas_mass=masses[shell_gas_mask]
-            shell_gas_hot=galaxy.loc[shell_gas_mask,'Temperature'].values>3e4
-            shell_gas_cold=galaxy.loc[shell_gas_mask,'Temperature'].values<3e4
+            #calculate the properties of the galaxy within the shells
+            for shell_str,shell_rad in shells_all.items():
+                maxrad_idx=np.searchsorted(radii,shell_rad*(rfac_offset+1))
+                maxrad_mask=np.ones(galaxy.shape[0])
+                maxrad_mask[:maxrad_idx]=0
+                maxrad_mask=maxrad_mask.astype(bool)
+                shell_star_mask=np.logical_and(maskstar,maxrad_mask)
+                shell_gas_mask=np.logical_and(maskgas,maxrad_mask)
+                shell_gas_mass=masses[shell_gas_mask]
+                shell_gas_hot=galaxy.loc[shell_gas_mask,'Temperature'].values>3e4
+                shell_gas_cold=galaxy.loc[shell_gas_mask,'Temperature'].values<3e4
 
-            shell_stars=galaxy.loc[shell_star_mask,:]
-            shell_gas=galaxy.loc[shell_gas_mask,:]
+                shell_stars=galaxy.loc[shell_star_mask,:]
+                shell_gas=galaxy.loc[shell_gas_mask,:]
 
-            if shell_stars.shape[0]:
-                galaxy_output[f'{shell_str}_sphere_star_tot']=np.nansum(masses[shell_star_mask])
-                galaxy_output[f'{shell_str}_sphere_star_Z']=np.nansum(shell_stars['Metallicity_00'].values*masses[shell_star_mask])/galaxy_output[f'{shell_str}_sphere_star_tot']
-                
-            else:
-                galaxy_output[f'{shell_str}_sphere_star_tot']=np.nan
-                galaxy_output[f'{shell_str}_sphere_star_Z']=np.nan
+                if shell_stars.shape[0]:
+                    galaxy_output[f'{shell_str}_sphere_star_tot']=np.nansum(masses[shell_star_mask])
+                    galaxy_output[f'{shell_str}_sphere_star_Z']=np.nansum(shell_stars['Metallicity_00'].values*masses[shell_star_mask])/galaxy_output[f'{shell_str}_sphere_star_tot']
+                    
+                else:
+                    galaxy_output[f'{shell_str}_sphere_star_tot']=np.nan
+                    galaxy_output[f'{shell_str}_sphere_star_Z']=np.nan
 
-            if shell_gas.shape[0]:
-                galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nansum(shell_gas_mass)
-                galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nansum(shell_gas_mass*shell_gas_hot)
-                galaxy_output[f'{shell_str}_sphere_gas_cold']=np.nansum(shell_gas_mass*shell_gas_cold)
-                galaxy_output[f'{shell_str}_sphere_gas_sfr']=np.nansum(shell_gas['StarFormationRate'].values)
-                galaxy_output[f'{shell_str}_sphere_gas_Z']=np.nansum(shell_gas['Metallicity_00'].values*shell_gas_mass)/galaxy_output[f'{shell_str}_sphere_gas_tot']
-
-            else:
-                galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nan
-                galaxy_output[f'{shell_str}_sphere_gas_sfr']=np.nan
-                galaxy_output[f'{shell_str}_sphere_gas_Z']=np.nan
-
-        #calculate the properties of the galaxy AT the shell radius
-        for shell_str,shell_rad in shells_all.items():
-            minrad_idx=np.searchsorted(galaxy['R'].values,shell_rad*(1-rfac_offset))
-            rad_mask=np.ones(galaxy.shape[0])
-            rad_mask[:minrad_idx]=0
-            rad_mask[maxrad_idx:]=0
-            rad_mask=rad_mask.astype(bool)
-            
-            shell_star_mask=np.logical_and(maskstar,rad_mask)
-            shell_gas_mask=np.logical_and(maskgas,rad_mask)
-            shell_stars=galaxy.loc[shell_star_mask,:];shell_star_mask=np.where(shell_star_mask)
-            shell_gas=galaxy.loc[shell_gas_mask,:];shell_gas_mask=np.where(shell_gas_mask)
-            shell_gas_mass=masses[shell_gas_mask]
-
-            minrad=galaxy['R'].values[minrad_idx]
-            maxrad=galaxy['R'].values[maxrad_idx-1]
-            dA=4*np.pi*(maxrad**2-minrad**2)
-
-            if shell_stars.shape[0]:
-                galaxy_output[f'{shell_str}_shell_star_totsd']=np.nansum(masses[shell_star_mask])/dA
-                galaxy_output[f'{shell_str}_shell_star_Z']=np.nansum(shell_stars['Metallicity_00'].values*masses[shell_star_mask])/galaxy_output[f'{shell_str}_shell_star_totsd']
-
-            else:
-                galaxy_output[f'{shell_str}_shell_star_totsd']=0
-                galaxy_output[f'{shell_str}_shell_star_Z']=np.nan
-
-            if shell_gas.shape[0]:
-                galaxy_output[f'{shell_str}_shell_gas_totsd']=np.nansum(shell_gas_mass)/dA
-                galaxy_output[f'{shell_str}_shell_gas_sfrsd']=np.nansum(shell_gas['StarFormationRate'].values)/dA                    
-                galaxy_output[f'{shell_str}_shell_gas_nH']=np.average(shell_gas['nH'].values,weights=shell_gas_mass)
-                galaxy_output[f'{shell_str}_shell_gas_T']=np.average(shell_gas['Temperature'].values,weights=shell_gas_mass)
-                galaxy_output[f'{shell_str}_shell_gas_Z']=np.nansum(shell_gas['Metallicity_00'].values*shell_gas_mass)/galaxy_output[f'{shell_str}_shell_gas_totsd']
-            else:
-                galaxy_output[f'{shell_str}_shell_gas_totsd']=0
-                galaxy_output[f'{shell_str}_shell_gas_sfrsd']=0                
-                galaxy_output[f'{shell_str}_shell_gas_nH']=0
-                galaxy_output[f'{shell_str}_shell_gas_T']=np.nan
-                galaxy_output[f'{shell_str}_shell_gas_Z']=np.nan
-
-            #calculate the properties of the gas inflow and outflow at the shell radius
-            inflow_mask=vrad_mask[shell_gas_mask]<=0
-            outflow_mask=vrad_mask[shell_gas_mask]>0
-            outflow_vesc_mask=vrad_mask[shell_gas_mask]>0.25*v200
-            vrad_converted=vrad_flow[shell_gas_mask]
-            dr=shell_rad*(rfac_offset+1)-shell_rad*(1-rfac_offset)
-
-            for mask, flow_str in zip([inflow_mask,outflow_mask,outflow_vesc_mask],['inflow_all','outflow_all','outflow_vesc']):
-                if 'inflow' in flow_str:sign=-1
-                else:sign=1
-
-                if np.nansum(mask):
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_mdot']=1/dr*np.sum(shell_gas_mass[mask]*(vrad_converted[mask]))*sign
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_T']=np.average(shell_gas['Temperature'].values[mask],weights=shell_gas_mass[mask])
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_Z']=np.nansum(shell_gas['Metallicity_00'].values[mask]*shell_gas_mass[mask])/np.nansum(shell_gas_mass[mask])
+                if shell_gas.shape[0]:
+                    galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nansum(shell_gas_mass)
+                    galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nansum(shell_gas_mass*shell_gas_hot)
+                    galaxy_output[f'{shell_str}_sphere_gas_cold']=np.nansum(shell_gas_mass*shell_gas_cold)
+                    galaxy_output[f'{shell_str}_sphere_gas_sfr']=np.nansum(shell_gas['StarFormationRate'].values)
+                    galaxy_output[f'{shell_str}_sphere_gas_Z']=np.nansum(shell_gas['Metallicity_00'].values*shell_gas_mass)/galaxy_output[f'{shell_str}_sphere_gas_tot']
 
                 else:
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_mdot']=0
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_T']=np.nan
-                    galaxy_output[f'{shell_str}_shell_gas{flow_str}_Z']=np.nan
+                    galaxy_output[f'{shell_str}_sphere_gas_tot']=np.nan
+                    galaxy_output[f'{shell_str}_sphere_gas_sfr']=np.nan
+                    galaxy_output[f'{shell_str}_sphere_gas_Z']=np.nan
 
-        #append the galaxy properties to the output
-        for column in galaxy_output:
-            galaxy_output[column]=np.float64(galaxy_output[column])
+            #calculate the properties of the galaxy AT the shell radius
+            for shell_str,shell_rad in shells_all.items():
+                minrad_idx=np.searchsorted(galaxy['R'].values,shell_rad*(1-rfac_offset))
+                rad_mask=np.ones(galaxy.shape[0])
+                rad_mask[:minrad_idx]=0
+                rad_mask[maxrad_idx:]=0
+                rad_mask=rad_mask.astype(bool)
+                
+                shell_star_mask=np.logical_and(maskstar,rad_mask)
+                shell_gas_mask=np.logical_and(maskgas,rad_mask)
+                shell_stars=galaxy.loc[shell_star_mask,:];shell_star_mask=np.where(shell_star_mask)
+                shell_gas=galaxy.loc[shell_gas_mask,:];shell_gas_mask=np.where(shell_gas_mask)
+                shell_gas_mass=masses[shell_gas_mask]
+
+                minrad=galaxy['R'].values[minrad_idx]
+                maxrad=galaxy['R'].values[maxrad_idx-1]
+                dA=4*np.pi*(maxrad**2-minrad**2)
+
+                if shell_stars.shape[0]:
+                    galaxy_output[f'{shell_str}_shell_star_totsd']=np.nansum(masses[shell_star_mask])/dA
+                    galaxy_output[f'{shell_str}_shell_star_Z']=np.nansum(shell_stars['Metallicity_00'].values*masses[shell_star_mask])/galaxy_output[f'{shell_str}_shell_star_totsd']
+
+                else:
+                    galaxy_output[f'{shell_str}_shell_star_totsd']=0
+                    galaxy_output[f'{shell_str}_shell_star_Z']=np.nan
+
+                if shell_gas.shape[0]:
+                    galaxy_output[f'{shell_str}_shell_gas_totsd']=np.nansum(shell_gas_mass)/dA
+                    galaxy_output[f'{shell_str}_shell_gas_sfrsd']=np.nansum(shell_gas['StarFormationRate'].values)/dA                    
+                    galaxy_output[f'{shell_str}_shell_gas_nH']=np.average(shell_gas['nH'].values,weights=shell_gas_mass)
+                    galaxy_output[f'{shell_str}_shell_gas_T']=np.average(shell_gas['Temperature'].values,weights=shell_gas_mass)
+                    galaxy_output[f'{shell_str}_shell_gas_Z']=np.nansum(shell_gas['Metallicity_00'].values*shell_gas_mass)/galaxy_output[f'{shell_str}_shell_gas_totsd']
+                else:
+                    galaxy_output[f'{shell_str}_shell_gas_totsd']=0
+                    galaxy_output[f'{shell_str}_shell_gas_sfrsd']=0                
+                    galaxy_output[f'{shell_str}_shell_gas_nH']=0
+                    galaxy_output[f'{shell_str}_shell_gas_T']=np.nan
+                    galaxy_output[f'{shell_str}_shell_gas_Z']=np.nan
+
+                #calculate the properties of the gas inflow and outflow at the shell radius
+                inflow_mask=vrad_mask[shell_gas_mask]<=0
+                outflow_mask=vrad_mask[shell_gas_mask]>0
+                outflow_vesc_mask=vrad_mask[shell_gas_mask]>0.25*v200
+                vrad_converted=vrad_flow[shell_gas_mask]
+                dr=shell_rad*(rfac_offset+1)-shell_rad*(1-rfac_offset)
+
+                for mask, flow_str in zip([inflow_mask,outflow_mask,outflow_vesc_mask],['inflow_all','outflow_all','outflow_vesc']):
+                    if 'inflow' in flow_str:sign=-1
+                    else:sign=1
+
+                    if np.nansum(mask):
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_mdot']=1/dr*np.sum(shell_gas_mass[mask]*(vrad_converted[mask]))*sign
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_T']=np.average(shell_gas['Temperature'].values[mask],weights=shell_gas_mass[mask])
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_Z']=np.nansum(shell_gas['Metallicity_00'].values[mask]*shell_gas_mass[mask])/np.nansum(shell_gas_mass[mask])
+
+                    else:
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_mdot']=0
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_T']=np.nan
+                        galaxy_output[f'{shell_str}_shell_gas{flow_str}_Z']=np.nan
+
+            #append the galaxy properties to the output
+            for column in galaxy_output:
+                galaxy_output[column]=np.float64(galaxy_output[column])
 
 
-        galaxy_output=pd.Series(galaxy_output).to_frame().T
-        galaxy_output_all.append(galaxy_output)
+            galaxy_output=pd.Series(galaxy_output).to_frame().T
+            galaxy_output_all.append(galaxy_output)
+        else:
+            locked_print(f'----> No particles found in galaxy {halo["ID"]}.')
+            galaxy_output_all.append(pd.Series(halo).to_frame().T)
+            continue
 
     #concatenate the outputs for each halo
     galaxies=pd.concat(galaxy_output_all)
