@@ -346,8 +346,10 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
         galaxies=pd.DataFrame()
     
     #"grouper" analyses the galaxies to find potential groups and remnants
-    if grouper and galaxies.shape[0]>1:
+    if grouper and galaxies.shape[0]>1 and '1p00restar_sphere_star_tot' in galaxies.columns:
         galaxies=group_galaxies(galaxies,verbose=verbose)
+    elif grouper:
+        print(f'Not enough galaxies to group in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
 
     locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
     if verbose:
