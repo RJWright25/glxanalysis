@@ -164,9 +164,9 @@ def plot_glxsep(simulation,id1=None,id2=None):
     snaptime=galaxies_masked[id1]['Time'].values[:idx_merger]
 
     #separation
-    xsep=galaxies_masked[haloids[0]]['xminpot'].values[:idx_merger]-galaxies_masked[haloids[1]]['xminpot'].values[:idx_merger]
-    ysep=galaxies_masked[haloids[0]]['yminpot'].values[:idx_merger]-galaxies_masked[haloids[1]]['yminpot'].values[:idx_merger]
-    zsep=galaxies_masked[haloids[0]]['zminpot'].values[:idx_merger]-galaxies_masked[haloids[1]]['zminpot'].values[:idx_merger]
+    xsep=galaxies_masked[haloids[0]]['x'].values[:idx_merger]-galaxies_masked[haloids[1]]['x'].values[:idx_merger]
+    ysep=galaxies_masked[haloids[0]]['y'].values[:idx_merger]-galaxies_masked[haloids[1]]['y'].values[:idx_merger]
+    zsep=galaxies_masked[haloids[0]]['z'].values[:idx_merger]-galaxies_masked[haloids[1]]['z'].values[:idx_merger]
     sep=np.sqrt(xsep**2+ysep**2+zsep**2)
 
     #relative velocity
