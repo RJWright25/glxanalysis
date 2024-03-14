@@ -168,6 +168,9 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
 
     #times
     snaptime=galaxies_masked[id1]['Time'].values
+    isnaps=np.int32(galaxies_masked[id1]['isnap'].values)
+    redshifts=[simulation.snapshots[isnap].redshift for isnap in isnaps]
+    scalefacs=np.array([1/(redshift+1) for redshift in redshifts])
 
     #separation
     xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
@@ -176,9 +179,9 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     sep=np.sqrt(xsep**2+ysep**2+zsep**2)
 
     #relative velocity
-    vxsep=(galaxies_masked[haloids[0]]['vx'].values-galaxies_masked[haloids[1]]['vx'].values)
-    vysep=(galaxies_masked[haloids[0]]['vy'].values-galaxies_masked[haloids[1]]['vy'].values)
-    vzsep=(galaxies_masked[haloids[0]]['vz'].values-galaxies_masked[haloids[1]]['vz'].values)
+    vxsep=(galaxies_masked[haloids[0]]['vx'].values-galaxies_masked[haloids[1]]['vx'].values)*np.sqrt(scalefacs)
+    vysep=(galaxies_masked[haloids[0]]['vy'].values-galaxies_masked[haloids[1]]['vy'].values)*np.sqrt(scalefacs)
+    vzsep=(galaxies_masked[haloids[0]]['vz'].values-galaxies_masked[haloids[1]]['vz'].values)*np.sqrt(scalefacs)
     vrel=np.sqrt(vxsep**2+vysep**2+vzsep**2)
 
     #bh separation
