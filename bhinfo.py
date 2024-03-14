@@ -188,9 +188,6 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         for key in [f'Coordinates_{x}' for x in 'xyz']:
             bhdata_ibh[key]=bhdata_ibh[key]*bhdata_ibh['Time'].values/simulation.hubble
 
-        for key in [f'Velocities_{x}' for x in 'xyz']:
-            bhdata_ibh[key]=bhdata_ibh[key]1/(bhdata_ibh['Time'].values)
-
 
         #now add closest snap index from the main simulation to the BH data
         bhdata_ibh['isnap']=np.zeros(bhdata_ibh.shape[0])
