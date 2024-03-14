@@ -162,7 +162,18 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
     for ihalo,halo in haloes.iterrows():
         if verbose:
             print(f'Considering galaxy {ihalo+1}/{haloes.shape[0]} (ID={int(halo["ID"])})...')
-            
+
+        #calculate cap for rhalf if the halo is close to another halo
+        r_to_closest_halo=np.sqrt((halo['x']-haloes['x'].values)**2+(halo['y']-haloes['y'].values)**2+(halo['z']-haloes['z'].values)**2)
+        r_to_closest_halo=sorted(r_to_closest_halo)[1]
+        if r_to_closest_halo>0.05*halo['Halo_R_Crit200']/(2/3):
+            rhalf_cap=0.05*halo['Halo_R_Crit200']
+        else:
+            rhalf_cap=r_to_closest_halo*2/3
+        #if this shrinks the rhalf_cap to less than 1 kpc, set it to 1 kpc
+        if rhalf_cap<1:
+            rhalf_cap=1
+
         #center on the halo and 1.1R200 radius
         if useminpot:
             center=np.array([halo['xminpot'],halo['yminpot'],halo['zminpot']])*snapshot.units["Coordinates"]
@@ -188,8 +199,8 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             galaxy_output[column]=halo[column]
 
         #calculate the effective half-mass radius of the stars, gas, etc
-        #select particles within 5ckpc 
-        central=galaxy['R'].values<(5*1/(1+snapshot.redshift))
+        #select particles within rhalf_cap
+        central=galaxy['R'].values<rhalf_cap
         gas=galaxy.loc[np.logical_and(maskgas,central),:]
         stars=galaxy.loc[np.logical_and(maskstar,central),:]
         doanalysis=True
