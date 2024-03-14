@@ -201,8 +201,8 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
         idx_prim=np.argmin(np.abs(time_rem-time))
         xyz_sec=bhdetails_masked[bhid_sec].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[itime,:]
         xyz_rem=bhdetails_masked[bhid_remnant].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[idx_prim,:]
-        vel_sec=bhdetails_masked[bhid_sec].loc[:,['V_x','V_y','V_z']].values[itime,:]/np.sqrt(bhdetails_masked[bhid_sec]['scalefac'].values[itime])
-        vel_rem=bhdetails_masked[bhid_remnant].loc[:,['V_x','V_y','V_z']].values[idx_prim,:]/np.sqrt(bhdetails_masked[bhid_remnant]['scalefac'].values[idx_prim])
+        vel_sec=bhdetails_masked[bhid_sec].loc[:,['V_x','V_y','V_z']].values[itime,:]/bhdetails_masked[bhid_sec]['scalefac'].values[itime]
+        vel_rem=bhdetails_masked[bhid_remnant].loc[:,['V_x','V_y','V_z']].values[idx_prim,:]/bhdetails_masked[bhid_remnant]['scalefac'].values[idx_prim]
         vel_bh[itime]=np.sqrt(np.sum((vel_sec-vel_rem)**2))
         sep_bh[itime]=np.sqrt(np.sum((xyz_sec-xyz_rem)**2))
 
