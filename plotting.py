@@ -159,6 +159,10 @@ def plot_glxsep(simulation,id1=None,id2=None):
     galaxies_masked={id:galaxies.loc[galaxies['ID'].values==id,:] for id in haloids}
     bhdetails_masked={id:bhdetails[id] for id in haloids}
 
+    #minimum snap for each galaxy
+    isnap_start=np.nanmin([galaxies_masked[id]['isnap'].values[0] for id in haloids])
+    galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values>=isnap_start,:] for id in haloids}
+
     #times
     idx_merger=np.nanmin([galaxies_masked[id].shape[0] for id in haloids])
     snaptime=galaxies_masked[id1]['Time'].values[:idx_merger]
