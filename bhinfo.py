@@ -186,7 +186,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         bhdata_ibh['bh_M']=bhdata_ibh['bh_M']*1e10/simulation.hubble
         bhdata_ibh['bh_Mdot']=bhdata_ibh['bh_Mdot']#don't think this needs to be converted
         for key in [f'Coordinates_{x}' for x in 'xyz']:
-            bhdata_ibh[key]=bhdata_ibh[key]/simulation.hubble
+            bhdata_ibh[key]=bhdata_ibh[key]*bhdata_ibh['Time'].values/simulation.hubble
 
 
         #now add closest snap index from the main simulation to the BH data
