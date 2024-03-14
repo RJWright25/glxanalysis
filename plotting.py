@@ -172,8 +172,6 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #sectime
     snaptime2=galaxies_masked[id2]['Time'].values
 
-    print(np.column_stack([snaptime,snaptime2]))
-
     #separation
     xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
     ysep=galaxies_masked[haloids[0]]['y'].values-galaxies_masked[haloids[1]]['y'].values
@@ -196,8 +194,9 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #match time-step from secondary to primary
     time_sec=bhdetails_masked[bhid_sec]['Time'].values
     time_rem=bhdetails_masked[bhid_remnant]['Time'].values
-    sep_bh=np.zeros(time_sec.shape[0])
-    vel_bh=np.zeros(time_sec.shape[0])
+
+    sep_bh=np.zeros_like(snaptime)
+    vel_bh=np.zeros_like(snaptime)
     
     #for each time in the snaps, find the idx of the closest time in the primary and get sep/vel at that idx
     for itime,time in enumerate(snaptime):
