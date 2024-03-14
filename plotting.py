@@ -199,16 +199,13 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     sep_bh=np.zeros(time_sec.shape[0])
     vel_bh=np.zeros(time_sec.shape[0])
     
-    #for each time in the secondary, find the idx of the closest time in the primary and get sep/vel at that idx
-    for itime,time in enumerate(time_sec):
+    #for each time in the snaps, find the idx of the closest time in the primary and get sep/vel at that idx
+    for itime,time in enumerate(snaptime):
         idx_prim=np.argmin(np.abs(time_rem-time))
-        xyz_sec=bhdetails_masked[bhid_sec].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[itime,:]
-        xyz_rem=bhdetails_masked[bhid_remnant].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[idx_prim,:]
-        vel_sec=bhdetails_masked[bhid_sec].loc[:,['V_x','V_y','V_z']].values[itime,:]
-        vel_rem=bhdetails_masked[bhid_remnant].loc[:,['V_x','V_y','V_z']].values[idx_prim,:]
-        vel_bh[itime]=np.sqrt(np.sum((vel_sec-vel_rem)**2))
-        sep_bh[itime]=np.sqrt(np.sum((xyz_sec-xyz_rem)**2))
-
+        idx_sec=np.argmin(np.abs(time_sec-time))
+        sep_bh[itime]=np.sqrt(np.sum((bhdetails_masked[bhid_remnant].loc[idx_prim,['Coordinates_x','Coordinates_y','Coordinates_z']].values-bhdetails_masked[bhid_sec].loc[idx_sec,['Coordinates_x','Coordinates_y','Coordinates_z']].values)**2))
+        vel_bh[itime]=np.sqrt(np.sum((bhdetails_masked[bhid_remnant].loc[idx_prim,['V_x','V_y','V_z']].values-bhdetails_masked[bhid_sec].loc[idx_sec,['V_x','V_y','V_z']].values)**2))
+        
     #r200 and restar
     r200_0=galaxies_masked[haloids[0]]['Halo_R_Crit200'].values[:idx_merger]
     # r200_1=galaxies_masked[haloids[1]]['Halo_R_Crit200'].values[:idx_merger]
