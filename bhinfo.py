@@ -167,7 +167,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
     numcol=bhdata_ibh.shape[-1]
     columns=np.array(['Time','bh_M','bh_Mdot','rho','cs','gas_Vrel_tot','Coordinates_x','Coordinates_y','Coordinates_z','V_x','V_y','V_z','gas_Vrel_x','gas_Vrel_y','gas_Vrel_z','Flag_binary','companion_ID','bh_hsml'])
     columns=columns[:numcol]
-
+    
     #initialize the output
     bhdata={}
 
@@ -181,6 +181,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
         #assign columns
         bhdata_ibh.columns=columns
         bhdata_ibh['BH_ID']=np.ones(bhdata_ibh.shape[0])*int(bhid)
+        bhdata_ibh['ScaleFactor']=bhdata_ibh['Time'].values
 
         #convert to physical units
         bhdata_ibh['bh_M']=bhdata_ibh['bh_M']*1e10/simulation.hubble
@@ -195,8 +196,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
 
         #if cosmo sim, convert to universe age 
         if 'cosmo' in simulation.snapshot_type:
-            bhdata_ibh['scalefac']=bhdata_ibh['Time'].values
-            redshifts=1/bhdata_ibh['scalefac'].values-1
+            redshifts=1/bhdata_ibh['ScaleFactor'].values-1
             bhdata_ibh['Time']=simulation.cosmology.age(redshifts).value
 
         #add to the output
