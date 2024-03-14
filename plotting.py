@@ -159,24 +159,31 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     galaxies_masked={id:galaxies.loc[galaxies['ID'].values==id,:] for id in haloids}
     bhdetails_masked={id:bhdetails[id].loc[::bh_subsample,:] for id in haloids}
 
-    #minimum snap for each galaxy
-    isnap_start=np.nanmin([galaxies_masked[id]['isnap'].values[0] for id in haloids])
-    galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values>=isnap_start,:] for id in haloids}
+    #figure out when both galaxies exist
+    galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values>=np.nanmax([np.nanmin(galaxies_masked[id]['isnap'].values) for id in haloids]),:] for id in haloids}
+    galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values<=np.nanmin([np.nanmax(galaxies_masked[id]['isnap'].values) for id in haloids]),:] for id in haloids}
+
+    #check shapes
+    print([galaxies_masked[id].shape[0] for id in haloids])
 
     #times
     idx_merger=np.nanmin([galaxies_masked[id].shape[0] for id in haloids])
-    snaptime=galaxies_masked[id1]['Time'].values[:idx_merger]
+    snaptime=galaxies_masked[id1]['Time'].values
+    #sectime
+    snaptime2=bhdetails_masked[id2]['Time'].values
+
+    print(np.column_stack([snaptime,snaptime2]))
 
     #separation
-    xsep=galaxies_masked[haloids[0]]['x'].values[:idx_merger]-galaxies_masked[haloids[1]]['x'].values[:idx_merger]
-    ysep=galaxies_masked[haloids[0]]['y'].values[:idx_merger]-galaxies_masked[haloids[1]]['y'].values[:idx_merger]
-    zsep=galaxies_masked[haloids[0]]['z'].values[:idx_merger]-galaxies_masked[haloids[1]]['z'].values[:idx_merger]
+    xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
+    ysep=galaxies_masked[haloids[0]]['y'].values-galaxies_masked[haloids[1]]['y'].values
+    zsep=galaxies_masked[haloids[0]]['z'].values-galaxies_masked[haloids[1]]['z'].values
     sep=np.sqrt(xsep**2+ysep**2+zsep**2)
 
     #relative velocity
-    vxsep=galaxies_masked[haloids[0]]['vx'].values[:idx_merger]-galaxies_masked[haloids[1]]['vx'].values[:idx_merger]
-    vysep=galaxies_masked[haloids[0]]['vy'].values[:idx_merger]-galaxies_masked[haloids[1]]['vy'].values[:idx_merger]
-    vzsep=galaxies_masked[haloids[0]]['vz'].values[:idx_merger]-galaxies_masked[haloids[1]]['vz'].values[:idx_merger]
+    vxsep=galaxies_masked[haloids[0]]['vx'].values-galaxies_masked[haloids[1]]['vx'].values
+    vysep=galaxies_masked[haloids[0]]['vy'].values-galaxies_masked[haloids[1]]['vy'].values
+    vzsep=galaxies_masked[haloids[0]]['vz'].values-galaxies_masked[haloids[1]]['vz'].values
     vrel=np.sqrt(vxsep**2+vysep**2+vzsep**2)
 
     #bh separation
