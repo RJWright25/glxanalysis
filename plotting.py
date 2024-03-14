@@ -169,10 +169,6 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #times
     idx_merger=np.nanmin([galaxies_masked[id].shape[0] for id in haloids])
     snaptime=galaxies_masked[id1]['Time'].values
-    #sectime
-    snaptime2=galaxies_masked[id2]['Time'].values
-
-    print(np.column_stack([snaptime,snaptime2]))
 
     #separation
     xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
