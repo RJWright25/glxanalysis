@@ -230,9 +230,9 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
 
             #calculate the properties of the galaxy within the shells
             for shell_str,shell_rad in shells_all.items():
-                maxrad_idx=np.searchsorted(radii,shell_rad*(rfac_offset+1))
+                maxrad_idx=np.searchsorted(radii,shell_rad)
                 maxrad_mask=np.ones(galaxy.shape[0])
-                maxrad_mask[:maxrad_idx]=0
+                maxrad_mask[maxrad_idx:]=0
                 maxrad_mask=maxrad_mask.astype(bool)
                 shell_star_mask=np.logical_and(maskstar,maxrad_mask)
                 shell_gas_mask=np.logical_and(maskgas,maxrad_mask)
