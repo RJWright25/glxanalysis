@@ -172,6 +172,8 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #sectime
     snaptime2=galaxies_masked[id2]['Time'].values
 
+    print(np.column_stack([snaptime,snaptime2]))
+
     #separation
     xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
     ysep=galaxies_masked[haloids[0]]['y'].values-galaxies_masked[haloids[1]]['y'].values
@@ -194,17 +196,19 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #match time-step from secondary to primary
     time_sec=bhdetails_masked[bhid_sec]['Time'].values
     time_rem=bhdetails_masked[bhid_remnant]['Time'].values
-
-    sep_bh=np.zeros_like(snaptime)
-    vel_bh=np.zeros_like(snaptime)
+    sep_bh=np.zeros(time_sec.shape[0])
+    vel_bh=np.zeros(time_sec.shape[0])
     
-    #for each time in the snaps, find the idx of the closest time in the primary and get sep/vel at that idx
-    for itime,time in enumerate(snaptime):
+    #for each time in the secondary, find the idx of the closest time in the primary and get sep/vel at that idx
+    for itime,time in enumerate(time_sec):
         idx_prim=np.argmin(np.abs(time_rem-time))
-        idx_sec=np.argmin(np.abs(time_sec-time))
-        sep_bh[itime]=np.sqrt(np.sum((bhdetails_masked[bhid_remnant].loc[idx_prim,['Coordinates_x','Coordinates_y','Coordinates_z']].values-bhdetails_masked[bhid_sec].loc[idx_sec,['Coordinates_x','Coordinates_y','Coordinates_z']].values)**2))
-        vel_bh[itime]=np.sqrt(np.sum((bhdetails_masked[bhid_remnant].loc[idx_prim,['V_x','V_y','V_z']].values-bhdetails_masked[bhid_sec].loc[idx_sec,['V_x','V_y','V_z']].values)**2))
-        
+        xyz_sec=bhdetails_masked[bhid_sec].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[itime,:]
+        xyz_rem=bhdetails_masked[bhid_remnant].loc[:,['Coordinates_x','Coordinates_y','Coordinates_z']].values[idx_prim,:]
+        vel_sec=bhdetails_masked[bhid_sec].loc[:,['V_x','V_y','V_z']].values[itime,:]
+        vel_rem=bhdetails_masked[bhid_remnant].loc[:,['V_x','V_y','V_z']].values[idx_prim,:]
+        vel_bh[itime]=np.sqrt(np.sum((vel_sec-vel_rem)**2))
+        sep_bh[itime]=np.sqrt(np.sum((xyz_sec-xyz_rem)**2))
+
     #r200 and restar
     r200_0=galaxies_masked[haloids[0]]['Halo_R_Crit200'].values[:idx_merger]
     # r200_1=galaxies_masked[haloids[1]]['Halo_R_Crit200'].values[:idx_merger]
