@@ -164,12 +164,14 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
             print(f'Considering galaxy {ihalo+1}/{haloes.shape[0]} (ID={int(halo["ID"])})...')
 
         #calculate cap for rhalf if the halo is close to another halo
-        r_to_closest_halo=np.sqrt((halo['x']-haloes['x'].values)**2+(halo['y']-haloes['y'].values)**2+(halo['z']-haloes['z'].values)**2)
-        r_to_closest_halo=sorted(r_to_closest_halo)[1]
-        if r_to_closest_halo>0.05*halo['Halo_R_Crit200']/(2/3):
-            rhalf_cap=0.05*halo['Halo_R_Crit200']
-        else:
+        r_to_closest_halo=1e5
+        rhalf_cap=0.05*halo['Halo_R_Crit200']
+        if haloes.shape[0]>1:
+            r_to_closest_halo=np.sqrt((halo['x']-haloes['x'].values)**2+(halo['y']-haloes['y'].values)**2+(halo['z']-haloes['z'].values)**2)
+            r_to_closest_halo=sorted(r_to_closest_halo)[1]
+        if r_to_closest_halo<0.05*halo['Halo_R_Crit200']/(2/3):
             rhalf_cap=r_to_closest_halo*2/3
+            
         #if this shrinks the rhalf_cap to less than 1 kpc, set it to 1 kpc
         if rhalf_cap<1:
             rhalf_cap=1
