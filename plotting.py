@@ -117,7 +117,7 @@ def plot_glxevol(simulation,id=None):
 
 
 # This function is used to plot the separation and relative velocity of two galaxies specified by their IDs.
-def plot_glxsep(simulation,id1=None,id2=None):
+def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     
     """
     Plots the separation and relative velocity of two galaxies specified by their IDs.
@@ -157,7 +157,7 @@ def plot_glxsep(simulation,id1=None,id2=None):
     
     #mask galaxies and bhdetails
     galaxies_masked={id:galaxies.loc[galaxies['ID'].values==id,:] for id in haloids}
-    bhdetails_masked={id:bhdetails[id] for id in haloids}
+    bhdetails_masked={id:bhdetails[id].loc[::bh_subsample,:] for id in haloids}
 
     #minimum snap for each galaxy
     isnap_start=np.nanmin([galaxies_masked[id]['isnap'].values[0] for id in haloids])
