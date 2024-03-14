@@ -177,10 +177,9 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     sep=np.sqrt(xsep**2+ysep**2+zsep**2)
 
     #relative velocity
-    scalefacs=1/(1+galaxies_masked[haloids[0]]['Redshift'].values)
-    vxsep=(galaxies_masked[haloids[0]]['vx'].values-galaxies_masked[haloids[1]]['vx'].values)*np.sqrt(scalefacs)
-    vysep=(galaxies_masked[haloids[0]]['vy'].values-galaxies_masked[haloids[1]]['vy'].values)*np.sqrt(scalefacs)
-    vzsep=(galaxies_masked[haloids[0]]['vz'].values-galaxies_masked[haloids[1]]['vz'].values)*np.sqrt(scalefacs)
+    vxsep=(galaxies_masked[haloids[0]]['vx'].values-galaxies_masked[haloids[1]]['vx'].values)
+    vysep=(galaxies_masked[haloids[0]]['vy'].values-galaxies_masked[haloids[1]]['vy'].values)
+    vzsep=(galaxies_masked[haloids[0]]['vz'].values-galaxies_masked[haloids[1]]['vz'].values)
     vrel=np.sqrt(vxsep**2+vysep**2+vzsep**2)
 
     #bh separation
