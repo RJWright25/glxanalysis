@@ -167,8 +167,9 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     print([galaxies_masked[id].shape[0] for id in haloids])
 
     #times
-    idx_merger=np.nanmin([galaxies_masked[id].shape[0] for id in haloids])
     snaptime=galaxies_masked[id1]['Time'].values
+    scalefacs=galaxies_masked[id1]['scalefac'].values
+    print(scalefacs)
 
     #separation
     xsep=galaxies_masked[haloids[0]]['x'].values-galaxies_masked[haloids[1]]['x'].values
@@ -206,7 +207,7 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
         sep_bh[itime]=np.sqrt(np.sum((xyz_sec-xyz_rem)**2))
 
     #r200 and restar
-    r200_0=galaxies_masked[haloids[0]]['Halo_R_Crit200'].values[:idx_merger]
+    r200_0=galaxies_masked[haloids[0]]['Halo_R_Crit200'].values
     # r200_1=galaxies_masked[haloids[1]]['Halo_R_Crit200'].values[:idx_merger]
 
     #find tlims
