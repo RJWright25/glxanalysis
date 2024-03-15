@@ -472,6 +472,16 @@ class gadget_simulation:
                     os.remove(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'+fname)
 
         snapshot_list=self.snapshots
+
+        #find snapshots with both galaxies
+        galaxies=self.galaxies
+        isnaps_halo1=galaxies.loc[galaxies['ID'].values==ids[0],'isnap'].values
+        isnaps_halo2=galaxies.loc[galaxies['ID'].values==ids[1],'isnap'].values
+
+        #find the common snapshots
+        common_snaps=np.intersect1d(isnaps_halo1,isnaps_halo2)
+        snapshot_list=[snapshot for snapshot in snapshot_list if snapshot.snapshot_idx in common_snaps]
+
         snapshots_chunks=split_list(snapshot_list,numproc)
 
         procs=[]
