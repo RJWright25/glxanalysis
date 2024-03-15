@@ -484,7 +484,7 @@ class gadget_simulation:
         #add 5 snapshots after
         isnap_last=common_snaps[-1]
         for i in range(1,5):
-            snapshot_list.append(self.snapshots[isnap_last+i])
+            snapshot_list.append(self.snapshots[int(isnap_last+i)])
 
         #split for computation
         snapshots_chunks=split_list(snapshot_list,numproc)
