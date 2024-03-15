@@ -478,6 +478,9 @@ class gadget_simulation:
         isnaps_halo1=galaxies.loc[galaxies['ID'].values==ids[0],'isnap'].values
         isnaps_halo2=galaxies.loc[galaxies['ID'].values==ids[1],'isnap'].values
 
+        print(f'Galaxy {ids[0]} found in snapshots: ',isnaps_halo1)
+        print(f'Galaxy {ids[1]} found in snapshots: ',isnaps_halo2)
+
         #find the common snapshots
         common_snaps=np.intersect1d(isnaps_halo1,isnaps_halo2)
         snapshot_list=[snapshot for snapshot in snapshot_list if snapshot.snapshot_idx in common_snaps]
