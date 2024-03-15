@@ -481,7 +481,12 @@ class gadget_simulation:
         #find the common snapshots
         common_snaps=np.intersect1d(isnaps_halo1,isnaps_halo2)
         snapshot_list=[snapshot for snapshot in snapshot_list if snapshot.snapshot_idx in common_snaps]
+        #add 5 snapshots after
+        isnap_last=common_snaps[-1]
+        for i in range(1,5):
+            snapshot_list.append(self.snapshots[isnap_last+i])
 
+        #split for computation
         snapshots_chunks=split_list(snapshot_list,numproc)
 
         procs=[]

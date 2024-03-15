@@ -442,9 +442,10 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
         isnap_primary=isnap_gals.loc[isnap_gals['ID'].values==remnantid,:];isnap_primary.reset_index(drop=True,inplace=True)
         isnap_secondary=isnap_gals.loc[isnap_gals['ID'].values==secondid,:];isnap_secondary.reset_index(drop=True,inplace=True)
         num_gals=isnap_gals.shape[0]
-        if num_gals<2:
-            merged=True
-        elif num_gals==2:
+
+        if isnap_primary.shape[0]==1 and isnap_secondary.shape[0]==1:
+            merged=False
+        else:
             merged=False
         
         #get xysep
