@@ -446,7 +446,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
         if isnap_primary.shape[0]==1 and isnap_secondary.shape[0]==1:
             merged=False
         else:
-            merged=False
+            merged=True
         
         #get xysep
         poskey=''
