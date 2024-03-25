@@ -207,6 +207,7 @@ class gadget_idealised_snapshot_hki:
                     part = pfile[f'PartType{ptype}']
                 except:
                     print(f'Error: Particle type {ptype} not found in snapshot')
+                    particle_data[ptype] = pd.DataFrame()
                     continue
 
                 #apply any spatial cuts
@@ -517,6 +518,7 @@ class gadget_cosmo_snapshot_hki:
                     part = pfile[f'PartType{ptype}']
                 except:
                     print(f'Error: Particle type {ptype} not found in snapshot')
+                    particle_data[ptype] = pd.DataFrame()
                     continue
 
                 #apply any spatial cuts
