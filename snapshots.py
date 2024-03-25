@@ -203,7 +203,11 @@ class gadget_idealised_snapshot_hki:
         #open the snapshot file and get the requested fields
         with h5py.File(self.snapshot_file, 'r') as pfile:
             for ptype in types:
-                part = pfile[f'PartType{ptype}']
+                try:
+                    part = pfile[f'PartType{ptype}']
+                except:
+                    print(f'Error: Particle type {ptype} not found in snapshot')
+                    continue
 
                 #apply any spatial cuts
                 mask=np.ones(part['ParticleIDs'].shape[0], dtype=bool)
@@ -509,7 +513,11 @@ class gadget_cosmo_snapshot_hki:
         #open the snapshot file and get the requested fields
         with h5py.File(self.snapshot_file, 'r') as pfile:
             for ptype in types:
-                part = pfile[f'PartType{ptype}']
+                try:
+                    part = pfile[f'PartType{ptype}']
+                except:
+                    print(f'Error: Particle type {ptype} not found in snapshot')
+                    continue
 
                 #apply any spatial cuts
                 mask=np.ones(part['ParticleIDs'].shape[0], dtype=bool)

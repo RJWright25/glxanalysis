@@ -40,7 +40,6 @@ def basic_groupfinder(galaxies,verbose=False):
         galaxies_y=galaxies['y'].values
         galaxies_z=galaxies['z'].values
         galaxies_r200=galaxies['Halo_R_Crit200'].values
-        galaxies_restar=galaxies['restar_sphere'].values
         galaxies_m200=galaxies['Halo_M_Crit200'].values
         galaxies_mstar=galaxies['1p00restar_sphere_star_tot'].values
         galaxies_IDs=galaxies['ID'].values
@@ -60,9 +59,7 @@ def basic_groupfinder(galaxies,verbose=False):
 
             #distances
             distances=np.sqrt((galaxies_x-galaxies_x[igal])**2+(galaxies_y-galaxies_y[igal])**2+(galaxies_z-galaxies_z[igal])**2)
-            m200_offsets=np.abs(np.log10(galaxies_m200/galaxies_m200[igal]))
-            mstar_offsets=np.abs(np.log10(galaxies_mstar/galaxies_mstar[igal]))
-            
+
             #### GROUP FINDING ####
             #find the potential group members as galaxies with overlapping r200c
             group_id=isnap*1e4+iigal
