@@ -249,7 +249,7 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
 
     return fig,axes
 
-def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),center=None,useminpot=False,subsample=1,verbose=False):
+def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,useminpot=False,subsample=1,verbose=False):
     """
     Render a snapshot of the simulation.
 
@@ -322,7 +322,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
         ax.scatter(stars.loc[:,'Coordinates_x'].values,stars.loc[:,'Coordinates_y'].values,c=cname_star,alpha=0.03,s=0.05,lw=0,zorder=2)
 
     #add galaxy positions
-    if galaxies.shape[0]:
+    if galaxies:
         isnap_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
         if isnap_galaxies.shape[0]:
             mstar_mask=isnap_galaxies['1p00restar_sphere_star_tot'].values>=0
