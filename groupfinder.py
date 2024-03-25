@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 # This function is used to group galaxies in the same snapshot.
-def basic_groupfinder_2(galaxies,verbose=False):
+def basic_groupfinder(galaxies,verbose=False):
     
     # Sort by stellar mass to preference more massive galaxies as "central"
     galaxies.sort_values(by='1p00restar_sphere_star_tot',ascending=False,inplace=True)
