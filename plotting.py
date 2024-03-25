@@ -326,7 +326,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
         isnap_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
         if isnap_galaxies.shape[0]:
             mstar_mask=isnap_galaxies['1p00restar_sphere_star_tot'].values>=0
-            groupIDs=isnap_galaxies['GroupID'].values.unique()
+            groupIDs=np.unique(isnap_galaxies['GroupID'].values.unique())
             cols={-1:'k'}
             for igroup,groupID in enumerate(groupIDs):
                 cols[groupID]=f'C{igroup}'
