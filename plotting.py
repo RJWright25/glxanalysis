@@ -20,7 +20,7 @@ import moviepy.video.io.ImageSequenceClip
 # Default matplotlib settings and color selections
 plt.style.use('https://raw.githubusercontent.com/RJWright25/analysis/master/mplparams.txt')
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
-dpi=500
+dpi=1000
 
 # Define cmaps for gas and stars
 cname_star='#FDF9E8'
