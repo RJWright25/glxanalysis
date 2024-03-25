@@ -196,6 +196,11 @@ class gadget_simulation:
         bhs = load_hdf5(path)
         binaries = find_binaries(bhs,remove_unbound_gaps=True)
 
+        for bhids, bbh in binaries.items():
+            pars = ketjugw.orbital_parameters(*bbh)
+            if pars['t'].shape[0]>10:
+                binaries[bhids] = pars
+
         self.ketjubhs=bhs
         self.ketjubinaries=binaries
 
