@@ -267,6 +267,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
         If True, print the progress of the rendering.
     """
 
+    #set up the rendering parameters based on type
     if type=='baryons':
         ptypes=[0,4];radstr='Halo_R_Crit200';rfac=1
         cmap=cmap_gas
@@ -282,8 +283,8 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
     censtr=''
     if useminpot:censtr='minpot'
 
-
-    if galaxies==None:
+    #get galaxies if not provided
+    if not np.any(galaxies):
         try:
             galaxies=snapshot.galaxies
         except:
