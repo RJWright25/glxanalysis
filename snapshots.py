@@ -95,7 +95,8 @@ class gadget_idealised_snapshot_hki:
             self.Om0=snapshot['Header'].attrs['Omega0']
             self.hubble=snapshot['Header'].attrs['HubbleParam']
             self.cosmology = apy_cosmo.FlatLambdaCDM(H0=self.hubble*100, Om0=self.Om0)
-            self.mass_dm=None
+            self.mass_dm=None#only for cosmological sims
+            self.cosmorun=False
             self.XH=0.76
             self.XHe=0.24
         snapshot.close()
@@ -401,6 +402,7 @@ class gadget_cosmo_snapshot_hki:
             self.XH=0.76
             self.XHe=0.24
             self.mass_dm=snapshot['Header'].attrs['MassTable'][1]*1e10/self.hubble
+            self.cosmorun=True
             #get time from cosmology and afac
             self.time=self.cosmology.age(self.redshift).value
 
