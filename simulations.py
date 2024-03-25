@@ -347,6 +347,8 @@ class gadget_simulation:
 
     ######################################################################################################
     ########################################## Plotting methods ##########################################
+    ######################################################################################################
+
 
     # Method to plot the evolution of the galaxy properties
     def plot_glxevol(self,id=None):
@@ -409,102 +411,36 @@ class gadget_simulation:
 
         """
 
-        #make a directory for the outputs; if it already exists, remove the files
-        image_folder=f'{os.getcwd()}/plots/render_sim_{type}/'
-        if not os.path.exists(f'{os.getcwd()}/plots/'):
-            os.mkdir(f'{os.getcwd()}/plots/')
-        if not os.path.exists(image_folder):
-            os.mkdir(image_folder)
-        else:
-            for fname in os.listdir(image_folder):
-                if os.path.exists(image_folder+fname):
-                    os.remove(image_folder+fname)
+        gen_sim_animation(self,numproc=numproc,fps=fps,type=type,frame=frame,galaxies=galaxies,useminpot=useminpot,subsample=subsample,verbose=verbose)
+
         
-        #split the snapshots into chunks for multiprocessing
-        snapshot_list=self.snapshots
-        snapshots_chunks=split_list(snapshot_list,numproc)
-
-        #start the processes
-        procs=[]
-        for iproc in range(numproc):
-            time.sleep(0.1)
-            snapshots_ichunk=snapshots_chunks[iproc]
-            if verbose:
-                print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])
-            proc = multiprocessing.Process(target=render_sim_worker, args=(snapshots_ichunk,type,frame,galaxies,useminpot,subsample,verbose))
-            procs.append(proc)
-            proc.start()
-    
-        # complete the processes
-        for proc in procs:
-            proc.join()
-        time.sleep(2)
-
-        #load in snapshots, make a movie
-        image_files = sorted([os.path.join(image_folder,img)
-                    for img in os.listdir(image_folder)
-                    if img.endswith(".png")])
-        clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        clip.write_videofile(f'{image_folder}/animation_{type}.mp4')
-    
 
     # Method to render a merger 
     def gen_merger_animation(self,numproc=1,fps=10,ids=None,useminpot=False,verbose=False):
+        """
+        Render an animation of the interaction between two galaxies specified by their IDs.
 
-        if not np.any(ids):
-            haloids_unique=self.galaxies['ID'].unique()[:2]
-            ids=sorted([int(haloid) for haloid in haloids_unique])
+        Parameters
+        ----------
+        numproc : int
+            The number of processes to use.
+        fps : int
+            The frames per second for the animation.
+        ids : list
+            List of galaxy IDs to use in the animation.
+        useminpot : bool
+            If True, use the minimum potential of the star particles as the halo centre.
+        verbose : bool
+            If True, print the progress of the rendering.
 
-        image_folder=f'{os.getcwd()}/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'
-        if not os.path.exists(os.getcwd()+'/plots/'):
-            os.mkdir(os.getcwd()+'/plots/')
-        if not os.path.exists(image_folder):
-            os.mkdir(image_folder)
-        else:
-            for fname in os.listdir(image_folder):
-                if os.path.exists(image_folder+fname):
-                    os.remove(image_folder+fname)
 
-        snapshot_list=self.snapshots
+        Returns
+        ----------
+        None (writes the output to a file).
 
-        #find snapshots with both galaxies
-        galaxies=self.galaxies
-        isnaps_halo1=galaxies.loc[galaxies['ID'].values==ids[0],'isnap'].values
-        isnaps_halo2=galaxies.loc[galaxies['ID'].values==ids[1],'isnap'].values
+        """
 
-        print(f'Galaxy {ids[0]} found in snapshots: ',isnaps_halo1)
-        print(f'Galaxy {ids[1]} found in snapshots: ',isnaps_halo2)
+        gen_merger_animation(self,numproc=numproc,fps=fps,ids=ids,useminpot=useminpot,verbose=verbose)
 
-        #find the common snapshots
-        common_snaps=np.intersect1d(isnaps_halo1,isnaps_halo2)
-        snapshot_list=[snapshot for snapshot in snapshot_list if snapshot.snapshot_idx in common_snaps]
-        #add 5 snapshots after
-        isnap_last=common_snaps[-1]
-        for i in range(1,5):
-            snapshot_list.append(self.snapshots[int(isnap_last+i)])
-
-        #split for computation
-        snapshots_chunks=split_list(snapshot_list,numproc)
-
-        procs=[]
-        for iproc in range(numproc):
-            time.sleep(0.1)
-            snapshots_ichunk=snapshots_chunks[iproc]
-            if verbose:
-                print(f'Process {iproc} getting snaps: ', [snapshot.snapshot_idx for snapshot in snapshots_ichunk])            
-            proc = multiprocessing.Process(target=render_merger_worker, args=(snapshots_ichunk,self.galaxies,ids,useminpot,verbose))
-            procs.append(proc)
-            proc.start()
-    
-        # complete the processes
-        for proc in procs:
-            proc.join()
-        time.sleep(10)
-
-        image_files = sorted([os.path.join(image_folder,img)
-                    for img in os.listdir(image_folder)
-                    if img.endswith(".png")])
-        clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        clip.write_videofile(f'plots/render_merger_{int(ids[0])}_{int(ids[1])}/animation.mp4')
 
 
