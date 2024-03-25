@@ -269,11 +269,11 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
 
     #set up the rendering parameters based on type
     if type=='baryons':
-        ptypes=[0,4];radstr='Halo_R_Crit200';rfac=1
+        ptypes=[0,4,1];radstr='Halo_R_Crit200';rfac=1
         cmap=cmap_gas
         ls_sphere='--'
     elif type=='dm':
-        ptypes=[1];radstr='Halo_R_Crit200';rfac=1
+        ptypes=[1,0,4];radstr='Halo_R_Crit200';rfac=1
         cmap='viridis'
         ls_sphere='--'
     else:
