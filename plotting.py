@@ -334,8 +334,8 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
             for groupID in groupIDs:
                 col_group=cols[groupID]
                 group_mask=isnap_galaxies['GroupID'].values==groupID
-                cens=isnap_galaxies.loc[np.logical_and.reduce([group_mask,isnap_galaxies['Central'].values==1,mstar_mask]),:]
-                sats=isnap_galaxies.loc[np.logical_and.reduce([group_mask,isnap_galaxies['Central'].values==0,mstar_mask]),:]
+                cens=np.logical_and.reduce([group_mask,isnap_galaxies['Central'].values==1,mstar_mask])
+                sats=np.logical_and.reduce([group_mask,isnap_galaxies['Central'].values==0,mstar_mask])
 
                 if np.nansum(sats):
                     for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
