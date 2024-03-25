@@ -326,25 +326,20 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
         isnap_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
         if isnap_galaxies.shape[0]:
             mstar_mask=isnap_galaxies['1p00restar_sphere_star_tot'].values>=0
-            if 'Central' in list(isnap_galaxies.keys()):
-                centrals=np.logical_and.reduce([isnap_galaxies['Central'].values==1,mstar_mask])
-                sats=np.logical_and.reduce([isnap_galaxies['Central'].values==0,mstar_mask])
-                remnants=np.logical_and.reduce([isnap_galaxies['RemnantCentral'].values==1,mstar_mask])
-            else:
-                centrals=mstar_mask
-                sats=np.zeros_like(mstar_mask)
-                remnants=np.zeros_like(mstar_mask)
+            centrals=np.logical_and.reduce([isnap_galaxies['Central'].values==1,mstar_mask])
+            sats=np.logical_and.reduce([isnap_galaxies['Central'].values==0,mstar_mask])
+            remnants=np.logical_and.reduce([isnap_galaxies['RemnantCentral'].values==1,mstar_mask])
 
             if np.nansum(centrals):
                 for igal,gal in isnap_galaxies.loc[centrals,:].iterrows():
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=3)
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='k',zorder=3)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='w',zorder=3)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=0.5,c='k',zorder=3)
                     ax.add_artist(plt.Circle(radius=gal[radstr]*rfac,xy=[gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1]],color='w',lw=0.5,ls=ls_sphere,fill=False,zorder=3))
 
             if np.nansum(sats):
                 for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='w',zorder=2)
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=0.5,c='grey',zorder=2)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=0.5,c='w',zorder=3)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=0.25,c='grey',zorder=3)
             
             if np.nansum(remnants):
                 for ibh,bh in isnap_galaxies.loc[remnants,:].iterrows():
