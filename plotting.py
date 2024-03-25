@@ -282,6 +282,13 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
     censtr=''
     if useminpot:censtr='minpot'
 
+
+    if galaxies==None:
+        try:
+            galaxies=snapshot.galaxies
+        except:
+            galaxies=pd.DataFrame()
+
     pdata=snapshot.get_particle_data(keys=['Coordinates','Masses'], types=ptypes, center=None, radius=None,subsample=subsample)
 
     #find center based on particle positions
@@ -322,7 +329,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
         ax.scatter(stars.loc[:,'Coordinates_x'].values,stars.loc[:,'Coordinates_y'].values,c=cname_star,alpha=0.03,s=0.05,lw=0,zorder=2)
 
     #add galaxy positions
-    if not galaxies==None:
+    if galaxies.shape[0]:
         isnap_galaxies=galaxies.loc[galaxies['isnap'].values==snapshot.snapshot_idx,:]
         if isnap_galaxies.shape[0]:
             mstar_mask=isnap_galaxies['1p00restar_sphere_star_tot'].values>=0
