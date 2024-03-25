@@ -558,7 +558,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
             x1=isnap_primary[f'x{poskey}'].values[0];x2=isnap_secondary[f'x{poskey}'].values[0]
             y1=isnap_primary[f'y{poskey}'].values[0];y2=isnap_secondary[f'y{poskey}'].values[0]
             z1=isnap_primary[f'z{poskey}'].values[0];z2=isnap_secondary[f'z{poskey}'].values[0]
-            rad1=isnap_primary['restar_sphere'].values[0];rad2=isnap_secondary['restar_sphere'].values[0]
+            rad1=isnap_primary['restar_sphere'].values[0]*4;rad2=isnap_secondary['restar_sphere'].values[0]*4
             xysep=np.sqrt((x1-x2)**2+(y1-y2)**2)
             center=np.array([(x1+x2)/2,(y1+y2)/2,(z1+z2)/2])
         else:
@@ -566,7 +566,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
             y1=isnap_primary[f'y{poskey}'].values[0]
             z1=isnap_primary[f'z{poskey}'].values[0]
             x2=np.nan;y2=np.nan;z2=np.nan
-            rad1=isnap_gals['restar_sphere'].values[0];rad2=np.nan
+            rad1=isnap_gals['restar_sphere'].values[0]*4;rad2=np.nan
             xysep=0
             center=np.array([x1,y1,z1])
 
@@ -622,7 +622,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
 
 # Method to render a merger 
 def gen_merger_animation(simulation,numproc=1,fps=10,ids=None,useminpot=False,verbose=False):
-    
+
     """
     Render an animation of the interaction between two galaxies specified by their IDs.
 
