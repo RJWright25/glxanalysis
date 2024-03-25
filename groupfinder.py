@@ -68,12 +68,13 @@ def basic_groupfinder(galaxies,verbose=False):
             #find the potential group members as galaxies with overlapping r200c
             group_id=isnap*1e4+iigal
             group_mask=np.logical_and(isnap_mask,distances<1*galaxies_r200[iigal])
-
-            #assign group ID and find central galaxy
-            central_status=np.zeros(np.nansum(group_mask));central_status[0]=1
             if np.nansum(group_mask):
-                galaxies.loc[group_mask,'GroupID']=group_id
-                galaxies.loc[group_mask,'Central']=central_status
+
+                #assign group ID and find central galaxy
+                central_status=np.zeros(np.nansum(group_mask));central_status[0]=1
+                if np.nansum(group_mask):
+                    galaxies.loc[group_mask,'GroupID']=group_id
+                    galaxies.loc[group_mask,'Central']=central_status
 
             #### PARTNER FINDING ####
             #check if already a remnant
