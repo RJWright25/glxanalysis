@@ -410,11 +410,11 @@ class gadget_simulation:
         """
 
         #make a directory for the outputs; if it already exists, remove the files
-        image_folder=f'/plots/render_sim_{type}/'
+        image_folder=f'plots/render_sim_{type}/'
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
-        if not os.path.exists(os.getcwd()+image_folder):
-            os.mkdir(os.getcwd()+image_folder)
+        if not os.path.exists(os.getcwd()+'/'+image_folder):
+            os.mkdir(os.getcwd()+'/'+image_folder)
         else:
             for fname in os.listdir(os.getcwd()+image_folder):
                 if os.path.exists(os.getcwd()+image_folder+fname):
@@ -445,7 +445,7 @@ class gadget_simulation:
                     for img in os.listdir(image_folder)
                     if img.endswith(".png")])
         clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        clip.write_videofile(f'plots/render_sim/animation_{type}.mp4')
+        clip.write_videofile(f'plots/render_sim_{type}/animation_{type}.mp4')
     
 
     # Method to render a merger 
