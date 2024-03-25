@@ -13,27 +13,6 @@ import os
 import numpy as np
 import pandas as pd
 
-from multiprocessing import Lock
-
-# This function is used to print a string in a thread-safe manner.
-def locked_print(string):
-    """
-    Prints a string in a thread-safe manner.
-
-    Parameters:
-    -----------
-    string: str
-        The string to be printed.
-    
-    Returns:
-    -----------
-    None (prints the string to the console)
-    """
-    print_lock = Lock()
-    print_lock.acquire()
-    print(string)
-    print_lock.release()
-
 # This function is used to split a list into nproc parts.
 def split_list(lst,nproc):
     """

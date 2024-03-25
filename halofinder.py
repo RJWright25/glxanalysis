@@ -15,8 +15,6 @@ import numpy as np
 import pandas as pd
 import astropy.units as apy_units
 
-from .tools import locked_print
-
 # This function is used to find haloes in a snapshot.
 def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
 
@@ -181,7 +179,7 @@ def basic_halofinder(snapshot,delta=200,useminpot=False,verbose=True):
 
         print(f'Halo {bhlocs["ParticleIDs"].values[ibh]} found with mass = {halo_output[f"Halo_M_Crit{delta}"][ibh]:.2e} Msun and radius = {halo_output[f"Halo_R_Crit{delta}"][ibh]:.2f} kpc.')
 
-    locked_print(f'----> Halo finding complete for {snapshot.snapshot_file.split("/")[-1]} in {time.time()-t0:.2f} seconds.')
+    print(f'----> Halo finding complete for {snapshot.snapshot_file.split("/")[-1]} in {time.time()-t0:.2f} seconds.')
     if verbose:
         print()
     

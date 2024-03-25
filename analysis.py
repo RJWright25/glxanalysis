@@ -15,8 +15,6 @@ import pandas as pd
 import astropy.units as apy_units
 import astropy.constants as apy_const
 
-from .tools import locked_print
-
 # This function is used to calculate the properties of a galaxy in a snapshot, given the properties of the halo.
 def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=0.1,verbose=True):
 
@@ -140,7 +138,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
     haloes.reset_index(inplace=True,drop=True)
     
     if not haloes.shape[0]:
-        locked_print(f'----> No haloes tracked in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
+        print(f'----> No haloes tracked in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
     
     #deal with the shells
     if shells_kpc is None: 
@@ -351,7 +349,7 @@ def galaxy_analysis(snapshot,haloes,shells_kpc=None,useminpot=False,rfac_offset=
         print(f'No galaxies found in snapshot {snapshot.snapshot_file.split("/")[-1]}.')
         galaxies=pd.DataFrame()
     
-    locked_print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
+    print(f'----> Galaxy characterisation for {snapshot.snapshot_file.split("/")[-1]} complete in {time.time()-t0:.2f} seconds.')
     if verbose:
         print()
 

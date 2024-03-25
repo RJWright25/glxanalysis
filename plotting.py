@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt
 import sphviewer
 import moviepy.video.io.ImageSequenceClip
 
-from .tools import locked_print
-
 # Default matplotlib settings and color selections
 plt.style.use('https://raw.githubusercontent.com/RJWright25/analysis/master/mplparams.txt')
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
@@ -389,7 +387,7 @@ def render_sim_worker(snaplist,type='baryons',frame=None,galaxies=None,useminpot
     
     for snapshot in snaplist:
         if verbose:
-            locked_print(f"Rendering snap {snapshot.snapshot_idx}...")
+            print(f"Rendering snap {snapshot.snapshot_idx}...")
         fig,_=render_snap(snapshot,type=type,frame=frame,galaxies=galaxies,useminpot=useminpot,subsample=subsample,verbose=verbose)
         fig.savefig(f'plots/render_sim/snap_{str(snapshot.snapshot_idx).zfill(3)}.png',bbox_inches='tight')
         plt.close(fig)
@@ -466,7 +464,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
         ax.grid(which='both',alpha=0)
 
         if verbose:
-            locked_print(f"Rendering snap {isnap}...")
+            print(f"Rendering snap {isnap}...")
 
         frame=np.nanmax([xysep*1,25])
 
