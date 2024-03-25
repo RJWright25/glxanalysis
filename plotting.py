@@ -385,7 +385,7 @@ def render_sim_worker(snaplist,type='baryons',frame=None,galaxies=None,useminpot
         if verbose:
             print(f"Rendering snap {snapshot.snapshot_idx}...")
         fig,_=render_snap(snapshot,type=type,frame=frame,galaxies=galaxies,useminpot=useminpot,subsample=subsample,verbose=verbose)
-        fig.savefig(f'plots/render_sim/snap_{str(snapshot.snapshot_idx).zfill(3)}.png',bbox_inches='tight')
+        fig.savefig(f'plots/render_sim_{type}/snap_{str(snapshot.snapshot_idx).zfill(3)}.png',bbox_inches='tight')
         plt.close(fig)
     
 

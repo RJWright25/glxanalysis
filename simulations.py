@@ -410,15 +410,15 @@ class gadget_simulation:
         """
 
         #make a directory for the outputs; if it already exists, remove the files
-        image_folder=f'plots/render_sim/'
+        image_folder=f'plots/render_sim_{type}/'
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
-        if not os.path.exists(os.getcwd()+f'/plots/render_sim/'):
-            os.mkdir(os.getcwd()+f'/plots/render_sim/')
+        if not os.path.exists(os.getcwd()+image_folder):
+            os.mkdir(os.getcwd()+image_folder)
         else:
-            for fname in os.listdir(os.getcwd()+f'/plots/render_sim/'):
-                if os.path.exists(os.getcwd()+f'/plots/render_sim/'+fname):
-                    os.remove(os.getcwd()+f'/plots/render_sim/'+fname)
+            for fname in os.listdir(os.getcwd()+image_folder):
+                if os.path.exists(os.getcwd()+image_folder+fname):
+                    os.remove(os.getcwd()+image_folder+fname)
         
         #split the snapshots into chunks for multiprocessing
         snapshot_list=self.snapshots
