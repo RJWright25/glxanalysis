@@ -80,10 +80,8 @@ def basic_groupfinder(galaxies,verbose=False):
             if galaxies.loc[igal,'RemnantFlag']==1:
                 continue
             else:
-                #find the potential remnant partners as galaxies within 4*Restar and within 0.1 dex in Mstar and M200c
-                partner_mask=np.logical_and(distances<4*galaxies_restar[igal],distances>=1e-4)
-                partner_mask=np.logical_and(partner_mask,mstar_offsets<0.1)
-                partner_mask=np.logical_and(partner_mask,m200_offsets<0.1)
+                #find the potential remnant partners as galaxies within 1kpc
+                partner_mask=np.logical_and(distances<1,distances>=1e-4)
                 partner_mask=np.logical_and(partner_mask,isnap_mask)
 
                 if np.nansum(partner_mask):
