@@ -13,13 +13,17 @@ import numpy as np
 import pandas as pd
 
 # This function is used to group galaxies in the same snapshot.
-def basic_groupfinder(galaxies,verbose=False):
+def basic_groupfinder_2(galaxies,verbose=False):
+    
+    # Sort by stellar mass to preference more massive galaxies as "central"
+    galaxies.sort_values(by='1p00restar_sphere_star_tot',ascending=False,inplace=True)
+    galaxies.reset_index(drop=True,inplace=True)
     isnaps=galaxies['isnap'].values
 
     for isnap in np.unique(isnaps):
         if verbose:
-            print(f'Grouping galaxies in snapshot {isnap}...')
-        
+            print(f'Grouping galaxies in snapshot {int(isnap)}...')
+
         isnap_mask=galaxies['isnap'].values==isnap
 
         #initialise the output
@@ -41,7 +45,7 @@ def basic_groupfinder(galaxies,verbose=False):
         galaxies_mstar=galaxies['1p00restar_sphere_star_tot'].values
         galaxies_IDs=galaxies['ID'].values
 
-        #loop over the galaxies -- find whether any other haloes overlap their R200c
+        #loop over the galaxies ordered by stellar mass -- find whether any other haloes overlap their R200c
         iigal=-1
 
         for igal,gal in galaxies.loc[isnap_mask,:].iterrows():
@@ -50,48 +54,26 @@ def basic_groupfinder(galaxies,verbose=False):
                 print(f'Post-processing galaxy {iigal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})... in snap {isnap}')
             igal_ID=gal['ID']
 
+            #skip galaxy if already grouped
+            if gal['GroupID']>0:
+                print(f'Skipping galaxy {iigal}: already grouped')
+                continue
+
             #distances
             distances=np.sqrt((galaxies_x-galaxies_x[iigal])**2+(galaxies_y-galaxies_y[iigal])**2+(galaxies_z-galaxies_z[iigal])**2)
             m200_offsets=np.abs(np.log10(galaxies_m200/galaxies_m200[iigal]))
             mstar_offsets=np.abs(np.log10(galaxies_mstar/galaxies_mstar[iigal]))
             
             #### GROUP FINDING ####
-            #find the potential group members as galaxies within 2R200c
+            #find the potential group members as galaxies with overlapping r200c
+            group_id=isnap*1e4+iigal
             group_mask=np.logical_and(isnap_mask,distances<1*galaxies_r200[iigal])
-            #iteratively find the galaxies within 2R200c of the largest R200c until no more are found
-            numgals_thisgroup=np.nansum(group_mask)
-            for iiter in range(100): 
-                #find the largest R200c in the group
-                r200_to_use=np.max(galaxies_r200[group_mask])
-                #find the galaxies within 2R200c of the largest R200c
-                group_mask=np.logical_and(isnap_mask,np.logical_or(group_mask,distances<1*r200_to_use))
-                #check if any new galaxies are found
-                group_ids_thisgroup=galaxies['GroupID'].values[isnap_mask][group_mask]
-                for group_id_thisgroup in group_ids_thisgroup[group_ids_thisgroup>0]:
-                    group_mask=np.logical_and(isnap_mask,np.logical_or(group_mask,galaxies['GroupID'].values[isnap_mask]==group_id_thisgroup))
-                #check if the number of galaxies in the group has changed
-                if np.nansum(group_mask)>numgals_thisgroup:
-                    numgals_thisgroup=np.nansum(group_mask)
-                else:
-                    break
-            
 
-            #check if any of the galaxies are already in a group
-            group_ids_thisgroup=galaxies['GroupID'].values[group_mask]
-            if np.nansum(group_ids_thisgroup>0):
-                group_id=group_ids_thisgroup[group_ids_thisgroup>0][0]
-            else:
-                group_id=isnap*1e4+iigal
-            
             #assign group ID and find central galaxy
+            central_status=np.zeros(np.nansum(group_mask));central_status[0]=1
             if np.nansum(group_mask):
                 galaxies.loc[group_mask,'GroupID']=group_id
-                galaxies.loc[group_mask,'Central']=0
-
-                #central is the galaxy with the largest BH mass
-                igals_thisgroup_mstar=galaxies['1p00restar_sphere_star_tot'].values[group_mask]
-                igals_thisgroup_mstar_largest_ID=galaxies['ID'].values[group_mask][np.argmax(igals_thisgroup_mstar)]
-                galaxies.loc[np.logical_and(isnap_mask,igals_thisgroup_mstar_largest_ID==galaxies['ID'].values),'Central']=1
+                galaxies.loc[group_mask,'Central']=central_status
 
             #### PARTNER FINDING ####
             #check if already a remnant
@@ -123,12 +105,10 @@ def basic_groupfinder(galaxies,verbose=False):
         group_ids=np.unique(galaxies['GroupID'].values[isnap_mask])
         for group_id in group_ids:
             if group_id>0:
-                group_mask=np.logical_and(galaxies['GroupID'].values==group_id,isnap_mask)
+                group_mask=galaxies['GroupID'].values==group_id
                 if np.nansum(group_mask):
-                    group_central_mask=np.logical_and(group_mask,galaxies['Central'].values==1)
-                    group_xyz=np.array([galaxies.loc[group_central_mask,f'{x}'].values[0] for x in 'xyz'])
                     galaxies_xyz=np.array([galaxies['x'].values[group_mask],galaxies['y'].values[group_mask],galaxies['z'].values[group_mask]]).T
-                    galaxies.loc[group_mask,'CentralDist']=np.sqrt(np.sum((galaxies_xyz-group_xyz)**2,axis=1))
+                    galaxies.loc[group_mask,'CentralDist']=np.sqrt(np.sum((galaxies_xyz-galaxies_xyz[0,:])**2,axis=1))
 
     return galaxies
             
