@@ -47,27 +47,26 @@ def basic_groupfinder(galaxies,verbose=False):
 
         #loop over the galaxies ordered by stellar mass -- find whether any other haloes overlap their R200c
         iigal=-1
-
         for igal,gal in galaxies.loc[isnap_mask,:].iterrows():
             iigal+=1
             if verbose:
-                print(f'Post-processing galaxy {iigal+1}/{galaxies.shape[0]} (ID={int(gal["ID"])})... in snap {isnap}')
+                print(f'Post-processing galaxy {iigal+1}/{galaxies.loc[isnap_mask,:].shape[0]} (ID={int(gal["ID"])})... in snap {isnap}')
             igal_ID=gal['ID']
 
             #skip galaxy if already grouped
             if gal['GroupID']>0:
-                print(f'Skipping galaxy {iigal}: already grouped')
+                print(f'Skipping galaxy {igal_ID}: already grouped')
                 continue
 
             #distances
-            distances=np.sqrt((galaxies_x-galaxies_x[iigal])**2+(galaxies_y-galaxies_y[iigal])**2+(galaxies_z-galaxies_z[iigal])**2)
-            m200_offsets=np.abs(np.log10(galaxies_m200/galaxies_m200[iigal]))
-            mstar_offsets=np.abs(np.log10(galaxies_mstar/galaxies_mstar[iigal]))
+            distances=np.sqrt((galaxies_x-galaxies_x[igal])**2+(galaxies_y-galaxies_y[igal])**2+(galaxies_z-galaxies_z[igal])**2)
+            m200_offsets=np.abs(np.log10(galaxies_m200/galaxies_m200[igal]))
+            mstar_offsets=np.abs(np.log10(galaxies_mstar/galaxies_mstar[igal]))
             
             #### GROUP FINDING ####
             #find the potential group members as galaxies with overlapping r200c
             group_id=isnap*1e4+iigal
-            group_mask=np.logical_and(isnap_mask,distances<1*galaxies_r200[iigal])
+            group_mask=np.logical_and(isnap_mask,distances<1*galaxies_r200[igal])
             if np.nansum(group_mask):
 
                 #assign group ID and find central galaxy
@@ -82,7 +81,7 @@ def basic_groupfinder(galaxies,verbose=False):
                 continue
             else:
                 #find the potential remnant partners as galaxies within 4*Restar and within 0.1 dex in Mstar and M200c
-                partner_mask=np.logical_and(distances<4*galaxies_restar[iigal],distances>=1e-4)
+                partner_mask=np.logical_and(distances<4*galaxies_restar[igal],distances>=1e-4)
                 partner_mask=np.logical_and(partner_mask,mstar_offsets<0.1)
                 partner_mask=np.logical_and(partner_mask,m200_offsets<0.1)
                 partner_mask=np.logical_and(partner_mask,isnap_mask)

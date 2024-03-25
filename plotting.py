@@ -335,13 +335,11 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
                 sats=np.zeros_like(mstar_mask)
                 remnants=np.zeros_like(mstar_mask)
 
-        
             if np.nansum(centrals):
                 for igal,gal in isnap_galaxies.loc[centrals,:].iterrows():
                     ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=3)
                     ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='k',zorder=3)
                     ax.add_artist(plt.Circle(radius=gal[radstr]*rfac,xy=[gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1]],color='w',lw=0.5,ls=ls_sphere,fill=False,zorder=3))
-
 
             if np.nansum(sats):
                 for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
