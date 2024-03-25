@@ -143,7 +143,7 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
             return None
     
     #find all the files in the directory
-    bhfiles=np.array([path+fname for fname in os.listdir(path) if 'BH' in fname])
+    bhfiles=np.array([path+'/'+fname for fname in os.listdir(path) if 'BH' in fname])
 
     #cull the list if not all BHs are requested
     if bhids:
