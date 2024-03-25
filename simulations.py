@@ -499,7 +499,7 @@ class gadget_simulation:
         # complete the processes
         for proc in procs:
             proc.join()
-        time.sleep(2)
+        time.sleep(10)
 
         image_files = sorted([os.path.join(image_folder,img)
                     for img in os.listdir(image_folder)
