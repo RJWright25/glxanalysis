@@ -410,7 +410,7 @@ class gadget_simulation:
         """
 
         #make a directory for the outputs; if it already exists, remove the files
-        image_folder=f'plots/render_sim_{type}/'
+        image_folder=f'/plots/render_sim_{type}/'
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
         if not os.path.exists(os.getcwd()+image_folder):
