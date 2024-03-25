@@ -196,8 +196,8 @@ class gadget_simulation:
         bhs = load_hdf5(path)
         binaries = find_binaries(bhs,remove_unbound_gaps=True)
 
-        self.ketju_bhs=bhs
-        self.ketju_binaries=binaries
+        self.ketjubhs=bhs
+        self.ketjubinaries=binaries
 
         return bhs,binaries
 
