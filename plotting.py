@@ -335,22 +335,23 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
                 sats=np.zeros_like(mstar_mask)
                 remnants=np.zeros_like(mstar_mask)
 
-            if np.nansum(sats):
-                for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=2)
-                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='grey',zorder=2)
-
-            
-            if np.nansum(remnants):
-                for ibh,bh in isnap_galaxies.loc[remnants,:].iterrows():
-                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='w',lw=1,ls='-',fill=False,zorder=3))
-                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='red',lw=0.5,ls='-',fill=False,zorder=3))
         
             if np.nansum(centrals):
                 for igal,gal in isnap_galaxies.loc[centrals,:].iterrows():
                     ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=2,c='w',zorder=3)
                     ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='k',zorder=3)
                     ax.add_artist(plt.Circle(radius=gal[radstr]*rfac,xy=[gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1]],color='w',lw=0.5,ls=ls_sphere,fill=False,zorder=3))
+
+
+            if np.nansum(sats):
+                for igal,gal in isnap_galaxies.loc[sats,:].iterrows():
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=1,c='w',zorder=2)
+                    ax.scatter(gal[f'x{censtr}']-center[0],gal[f'y{censtr}']-center[1],s=0.5,c='grey',zorder=2)
+            
+            if np.nansum(remnants):
+                for ibh,bh in isnap_galaxies.loc[remnants,:].iterrows():
+                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='w',lw=1,ls='-',fill=False,zorder=3))
+                    ax.add_artist(plt.Circle(radius=bh[radstr]*rfac,xy=[bh[f'x{censtr}']-center[0],bh[f'y{censtr}']-center[1]],color='red',lw=0.5,ls='-',fill=False,zorder=3))
 
                     
     ax.set_xlim(-frame,frame)
