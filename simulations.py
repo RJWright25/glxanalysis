@@ -410,15 +410,15 @@ class gadget_simulation:
         """
 
         #make a directory for the outputs; if it already exists, remove the files
-        image_folder=f'plots/render_sim_{type}/'
-        if not os.path.exists(os.getcwd()+'/plots/'):
-            os.mkdir(os.getcwd()+'/plots/')
-        if not os.path.exists(os.getcwd()+'/'+image_folder):
-            os.mkdir(os.getcwd()+'/'+image_folder)
+        image_folder=f'{os.getcwd()}/plots/render_sim_{type}/'
+        if not os.path.exists(f'{os.getcwd()}/plots/'):
+            os.mkdir(f'{os.getcwd()}/plots/')
+        if not os.path.exists(image_folder):
+            os.mkdir(image_folder)
         else:
-            for fname in os.listdir(os.getcwd()+image_folder):
-                if os.path.exists(os.getcwd()+image_folder+fname):
-                    os.remove(os.getcwd()+image_folder+fname)
+            for fname in os.listdir(image_folder):
+                if os.path.exists(image_folder+fname):
+                    os.remove(image_folder+fname)
         
         #split the snapshots into chunks for multiprocessing
         snapshot_list=self.snapshots
@@ -445,7 +445,7 @@ class gadget_simulation:
                     for img in os.listdir(image_folder)
                     if img.endswith(".png")])
         clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
-        clip.write_videofile(f'plots/render_sim_{type}/animation_{type}.mp4')
+        clip.write_videofile(f'{image_folder}/animation_{type}.mp4')
     
 
     # Method to render a merger 
@@ -455,15 +455,15 @@ class gadget_simulation:
             haloids_unique=self.galaxies['ID'].unique()[:2]
             ids=sorted([int(haloid) for haloid in haloids_unique])
 
-        image_folder=f'plots/render_merger_{int(ids[0])}_{int(ids[1])}/'
+        image_folder=f'{os.getcwd()}/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
-        if not os.path.exists(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'):
-            os.mkdir(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/')
+        if not os.path.exists(image_folder):
+            os.mkdir(image_folder)
         else:
-            for fname in os.listdir(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'):
-                if os.path.exists(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'+fname):
-                    os.remove(os.getcwd()+f'/plots/render_merger_{int(ids[0])}_{int(ids[1])}/'+fname)
+            for fname in os.listdir(image_folder):
+                if os.path.exists(image_folder+fname):
+                    os.remove(image_folder+fname)
 
         snapshot_list=self.snapshots
 
