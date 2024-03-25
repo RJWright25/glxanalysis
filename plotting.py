@@ -360,10 +360,10 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
 
     ax.text(0.55,0.01,'$x$ [kpc]',transform=fig.transFigure,ha='center',va='bottom')
     ax.text(0.01,0.55,'$y$ [kpc]',transform=fig.transFigure,ha='left',va='center',rotation=90)
-    ax.text(x=0.95,y=0.95,s=r'$t='+f'{snapshot.time:.3f}$ Gyr',transform=ax.transAxes,ha='right',va='top',color='w')
+    ax.text(x=0.05,y=0.95,s=r'$t='+f'{snapshot.time:.3f}$ Gyr',transform=ax.transAxes,ha='left',va='top',color='w')
     #if a cosmological sim, also add the redshift
     if snapshot.cosmorun:
-        ax.text(x=0.95,y=0.9,s=r'$z='+f'{snapshot.redshift:.3f}$',transform=ax.transAxes,ha='right',va='top',color='w')
+        ax.text(x=0.95,y=0.95,s=r'$z='+f'{snapshot.redshift:.3f}$',transform=ax.transAxes,ha='right',va='top',color='w')
     
     fig.set_dpi(dpi)
 
