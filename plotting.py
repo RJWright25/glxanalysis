@@ -329,7 +329,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=pd.DataFrame(),cente
             if 'Central' in list(isnap_galaxies.keys()):
                 centrals=np.logical_and.reduce([isnap_galaxies['Central'].values==1,mstar_mask])
                 sats=np.logical_and.reduce([isnap_galaxies['Central'].values==0,mstar_mask])
-                remnants=np.logical_and.reduce([isnap_galaxies['iremnant_cen'].values==1,mstar_mask])
+                remnants=np.logical_and.reduce([isnap_galaxies['RemnantCentral'].values==1,mstar_mask])
             else:
                 centrals=mstar_mask
                 sats=np.zeros_like(mstar_mask)
