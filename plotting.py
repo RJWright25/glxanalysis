@@ -301,9 +301,11 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
 
     #find frame and center based on particle positions
     if not frame:
-        frame=(np.nanmax(pdata['Coordinates_x'].values)-np.nanmin(pdata['Coordinates_x'].values))/2
+        max_x=np.nanpercentile(pdata['Coordinates_x'].values,99)
+        min_x=np.nanpercentile(pdata['Coordinates_x'].values,1)
+        frame=(max_x-min_x)/2
         #if cosmo, half this
-        if snapshot.mass_dm>=0:
+        if snapshot.cosmorun:
             frame/=2
 
     sph_fluidmask=pdata['ParticleTypes'].values==ptypes[0]
