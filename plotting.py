@@ -304,6 +304,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
         max_x=np.nanpercentile(pdata['Coordinates_x'].values,99)
         min_x=np.nanpercentile(pdata['Coordinates_x'].values,1)
         frame=(max_x-min_x)/2
+
         #if cosmo, half this
         if snapshot.cosmorun:
             frame/=2
