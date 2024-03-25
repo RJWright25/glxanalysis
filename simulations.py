@@ -164,6 +164,44 @@ class gadget_simulation:
 
         return bhdata
     
+    def load_ketju_bhbinaries(self,path=None):
+        """
+        Load the black hole details and from a ketju file using the ketjugw package.
+
+        Parameters:
+        -----------
+        path: str
+            The path to the ketju file.
+        
+        Returns:
+        -----------
+        bhs : dict of IDs with ketjugw.particle objects
+            The black hole data.
+        binaries : dict of ID pairs with ketjugw.binary objects
+            The binary data.
+
+        """
+
+        try:
+            import ketjugw
+            from ketjugw import load_hdf5
+            from ketjugw import find_binaries
+        except:
+            print('ketjugw package not found.')
+            return None
+        
+        if not path:
+            path=self.snapshots[-1].snapshot_file.split('/')[:-1]
+            path='/'.join(path)+'/ketju_bhs.hdf5'
+        bhs = load_hdf5(path)
+        binaries = find_binaries(bhs,remove_unbound_gaps=True)
+
+        self.ketju_bhs=bhs
+        self.ketju_binaries=binaries
+
+        return bhs,binaries
+
+
     # Method to find haloes in all snapshots using multiprocessing
     def find_haloes(self,numproc=1,delta=200,useminpot=False,verbose=False):
         
