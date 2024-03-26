@@ -69,8 +69,6 @@ def plot_glxevol(simulation,id=None):
     #make sure the dataframes are sorted
     galaxies.sort_values(by='Time',ascending=True,inplace=True)
     galaxies.reset_index(drop=True,inplace=True)
-    bhdetails.sort_values(by='Time',ascending=True,inplace=True)
-    bhdetails.reset_index(drop=True,inplace=True)
 
     #if no id is given, take the first halo
     if not id:
@@ -175,10 +173,7 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #make sure the dataframes are sorted
     galaxies.sort_values(by='Time',ascending=True,inplace=True)
     galaxies.reset_index(drop=True,inplace=True)
-
-    bhdetails.sort_values(by='Time',ascending=True,inplace=True)
-    bhdetails.reset_index(drop=True,inplace=True)
-
+    
     #if no ids are given, take the first two haloes
     if not id1 or not id2:
         haloids=galaxies['ID'].unique()[:2]
