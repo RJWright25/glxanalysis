@@ -3,12 +3,12 @@ from setuptools import setup, find_packages
 setup(
     name="simpipelinehki", 
     version="1.0", 
-    author="Ruby J. Wright",  # Replace with your name
-    author_email="ruby.wright@helsinki.fi",  # Replace with your email
-    description="A package to analyse SMBH focused gadget simulations.",  # Replace with a brief description of your package
+    author="Ruby J. Wright",  
+    author_email="ruby.wright@helsinki.fi", 
+    description="A python package to analyse SMBH focused GADGET simulations.", 
     long_description=open('README.md').read(),  # Make sure you have a README.md file
     long_description_content_type="text/markdown",
-    url="http://github.com/yourusername/your-package",  # Replace with the URL of your package's source code
+    url="https://github.com/RJWright25/simpipelinehki",  
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -16,4 +16,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
+    install_requires=['numpy','pandas','matplotlib','scipy','astropy','h5py','pysphviewer','moviepy']
 )
