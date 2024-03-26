@@ -200,3 +200,47 @@ def read_bhdata(simulation,path=None,bhids=None,subsample=1):
     return bhdata
 
 
+
+def read_ketjubhdata(simulation,path=None):
+    """
+    Load the black hole details and from a ketju file using the ketjugw package.
+
+    Parameters:
+    -----------
+    simulation: simulation object
+        The simulation object for which the black hole details are to be read.
+    path: str
+        The path to the ketju file.
+    
+    Returns:
+    -----------
+    ketjubhs : dict of IDs 
+        The black hole data as ketjugw.particle objects.
+    ketjubinaries : dict of ID pairs
+        The binary orbital params from ketjugw.binary objects.
+        
+    """
+
+    try:
+        import ketjugw
+        from ketjugw import load_hdf5
+        from ketjugw import find_binaries
+    except:
+        print('ketjugw package not found.')
+        return None
+    
+    if not path:
+        path=simulation.snapshots[-1].snapshot_file.split('/')[:-1]
+        path='/'.join(path)+'/ketju_bhs.hdf5'
+        
+    ketjubhs = load_hdf5(path)
+    rawbinaries = find_binaries(ketjubhs,remove_unbound_gaps=True)
+    ketjubinaries={}
+    for bhids, bbh in rawbinaries.items():
+        pars = ketjugw.orbital_parameters(*bbh)
+        if pars['t'].shape[0]>10:
+            ketjubinaries[bhids] = pars
+
+    return ketjubhs,ketjubinaries
+
+

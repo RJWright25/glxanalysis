@@ -164,47 +164,30 @@ class gadget_simulation:
 
         return bhdata
     
-    def load_ketju_bhbinaries(self,path=None):
+    def load_ketjubhdata(self, path=None):
+
         """
-        Load the black hole details and from a ketju file using the ketjugw package.
+        Read the KETJU black hole details from a directory using the KETJU GW package.
 
         Parameters:
         -----------
         path: str
-            The path to the ketju file.
-        
+            The path to the directory containing the black hole details files.
+
         Returns:
         -----------
-        bhs : dict of IDs with ketjugw.particle objects
-            The black hole data.
-        binaries : dict of ID pairs with ketjugw.binary objects
-            The binary data.
+        ketjubhs : dict of IDs 
+            The black hole data as ketjugw.particle objects.
+        ketjubinaries : dict of ID pairs
+            The binary orbital params from ketjugw.binary objects.
 
         """
 
-        try:
-            import ketjugw
-            from ketjugw import load_hdf5
-            from ketjugw import find_binaries
-        except:
-            print('ketjugw package not found.')
-            return None
-        
-        if not path:
-            path=self.snapshots[-1].snapshot_file.split('/')[:-1]
-            path='/'.join(path)+'/ketju_bhs.hdf5'
-        bhs = load_hdf5(path)
-        binaries = find_binaries(bhs,remove_unbound_gaps=True)
-        binary_output={}
-        for bhids, bbh in binaries.items():
-            pars = ketjugw.orbital_parameters(*bbh)
-            if pars['t'].shape[0]>10:
-                binary_output[bhids] = pars
+        ketjubhs,ketjubinaries=read_ketjubhdata(self,path=path)
 
-        self.ketjubhs=bhs
-        self.ketjubinaries=binary_output
-
-        return bhs,binaries
+        self.ketjubhs=ketjubhs
+        self.ketjubinaries=ketjubinaries
+    
 
 
     # Method to find haloes in all snapshots using multiprocessing
