@@ -16,5 +16,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=['numpy','pandas','matplotlib','scipy','astropy','h5py','pysphviewer','moviepy']
+    install_requires=['numpy','pandas','matplotlib','scipy','astropy','h5py','py-sphviewer','moviepy']
 )
