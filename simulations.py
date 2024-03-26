@@ -395,7 +395,7 @@ class gadget_simulation:
         return fig,axes
 
     # Method to plot the evolution pair separation/velocity
-    def plot_glxsep(self,id1=None,id2=None,bh_subsample=10):
+    def plot_glxsep(self,ids=None,bh_subsample=10):
         """
         Plot the evolution of the pair separation/velocity.
         
@@ -409,7 +409,7 @@ class gadget_simulation:
             The ID of the second galaxy.
 
         """
-        fig,axes=plot_glxsep(self,id1=id1,id2=id2,bh_subsample=bh_subsample)
+        fig,axes=plot_glxsep(self,ids=ids,bh_subsample=bh_subsample)
         return fig,axes
     
     # Method to render all simulation snapshots
