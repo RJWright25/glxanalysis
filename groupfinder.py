@@ -40,8 +40,6 @@ def basic_groupfinder(galaxies,verbose=False):
         galaxies_y=galaxies['y'].values
         galaxies_z=galaxies['z'].values
         galaxies_r200=galaxies['Halo_R_Crit200'].values
-        galaxies_m200=galaxies['Halo_M_Crit200'].values
-        galaxies_mstar=galaxies['1p00restar_sphere_star_tot'].values
         galaxies_IDs=galaxies['ID'].values
 
         #loop over the galaxies ordered by stellar mass -- find whether any other haloes overlap their R200c
