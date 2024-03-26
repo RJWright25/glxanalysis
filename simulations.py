@@ -187,7 +187,8 @@ class gadget_simulation:
 
         self.ketjubhs=ketjubhs
         self.ketjubinaries=ketjubinaries
-    
+
+        return ketjubhs,ketjubinaries
 
 
     # Method to find haloes in all snapshots using multiprocessing
