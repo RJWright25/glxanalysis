@@ -200,6 +200,8 @@ class gadget_simulation:
             pars = ketjugw.orbital_parameters(*bbh)
             if pars['t'].shape[0]>10:
                 binaries[bhids] = pars
+            else:
+                del binaries[bhids]
 
         self.ketjubhs=bhs
         self.ketjubinaries=binaries
