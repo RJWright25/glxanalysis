@@ -346,7 +346,7 @@ def render_snap(snapshot,type='baryons',frame=None,galaxies=None,center=None,use
 
     sph_fluidmask=pdata['ParticleTypes'].values==ptypes[0]
     sph_particles=sphviewer.Particles(pdata.loc[sph_fluidmask,[f'Coordinates_{x}' for x in 'xyz']].values,
-                                      pdata.loc[sph_fluidmask,'Masses'].values,nb=8)
+                                      pdata.loc[sph_fluidmask,'Masses'].values,nb=32)
     
     sph_camera = sphviewer.Camera(r='infinity', t=0, p=0, roll=0, xsize=1500, ysize=1500,
                                                 x=0, y=0, z=0,
@@ -586,7 +586,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
         gas=pdata.loc[pdata['ParticleTypes'].values==0,:]
 
         #sph rendering
-        sph_particles=sphviewer.Particles(gas.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values-center,gas['Masses'].values,nb=8)
+        sph_particles=sphviewer.Particles(gas.loc[:,[f'Coordinates_{x}' for x in 'xyz']].values-center,gas['Masses'].values,nb=32)
         sph_camera = sphviewer.Camera(r='infinity', t=0, p=0, roll=0, xsize=1500, ysize=1500,
                                                     x=0, y=0, z=0,
                                                     extent=[-frame,frame,-frame,frame])
