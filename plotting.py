@@ -746,17 +746,23 @@ def plot_bhbinarypars(simulation,binaries=None):
         for ax in axes:
             ax.grid(True,which='major',alpha=1)
 
+        
+
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='k',lw=2.5)
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='grey',lw=1.5)
         axes[0].set_ylabel(r'$a$ [kpc]')
+        axes[0].set_yscale('log')
+        axes[0].set_ylim(10**-3,10**2)
 
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='k',lw=2.5)
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='grey',lw=1.5)
         axes[1].set_ylabel(r'$e$')
+        axes[1].set_ylims(0,1)
 
         tlims=(binarypars['t'][0]-1e6,binarypars['t'][-1]+1e6)
         axes[0].set_xlim(tlims)
         axes[1].set_xlim(tlims)
+
 
         axes[1].set_xlabel(r'$t$ [Gyr]')
         fig.set_dpi(dpi)
