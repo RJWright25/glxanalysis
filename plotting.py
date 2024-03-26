@@ -754,8 +754,7 @@ def plot_bhbinarypars(simulation,binaries=None):
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='grey',lw=1.5)
         axes[1].set_ylabel(r'$e$')
 
-        if not tlims:
-            tlims=(binarypars['t'].values[0]-1e6,binarypars['t'].values[-1]+1e6)
+        tlims=(binarypars['t'].values[0]-1e6,binarypars['t'].values[-1]+1e6)
         axes[0].set_xlim(tlims)
         axes[1].set_xlim(tlims)
 
