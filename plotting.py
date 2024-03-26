@@ -752,7 +752,7 @@ def plot_bhbinarypars(simulation,binaries=None):
 
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='k',lw=2.5)
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='grey',lw=1.5)
-        axes[0].set_ylabel(r'$a$ [kpc]')
+        axes[0].set_ylabel(r'$a$ [pc]')
         axes[0].set_yscale('log')
         axes[0].set_ylim(10**-3.5,10**2)
         axes[0].set_xticklabels([])
