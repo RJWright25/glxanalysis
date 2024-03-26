@@ -140,7 +140,7 @@ def plot_glxevol(simulation,id=None):
 
 
 # This function is used to plot the separation and relative velocity of two galaxies specified by their IDs.
-def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
+def plot_glxsep(simulation,ids=None,bh_subsample=10):
     
     """
     Plots the separation and relative velocity of two galaxies specified by their IDs.
@@ -153,10 +153,8 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
         - haloes: pandas dataframe containing the properties of the halos found in the snapshot.
         - galaxies: pandas dataframe containing the properties of the galaxies found in the snapshot.
         - bhdetails: dictionary of pandas dataframes containing the properties of the black holes found in the snapshot.
-    id1 : int
-        ID (BH) of the first galaxy.
-    id2 : int
-        ID (BH) of the second galaxy.
+    ids: list
+        List of IDs of the galaxies to be plotted.
 
     Returns
     ----------
@@ -173,13 +171,13 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #make sure the dataframes are sorted
     galaxies.sort_values(by='Time',ascending=True,inplace=True)
     galaxies.reset_index(drop=True,inplace=True)
-    
+
     #if no ids are given, take the first two haloes
-    if not id1 or not id2:
+    if not ids:
         haloids=galaxies['ID'].unique()[:2]
         id1=haloids[0];id2=haloids[1]
     else:
-        haloids=[id1,id2]
+        haloids=[ids[0],ids[1]]
     
     #mask galaxies and bhdetails
     galaxies_masked={id:galaxies.loc[galaxies['ID'].values==id,:] for id in haloids}
@@ -188,9 +186,6 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
     #figure out when both galaxies exist
     galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values>=np.nanmax([np.nanmin(galaxies_masked[id]['isnap'].values) for id in haloids]),:] for id in haloids}
     galaxies_masked={id:galaxies_masked[id].loc[galaxies_masked[id]['isnap'].values<=np.nanmin([np.nanmax(galaxies_masked[id]['isnap'].values) for id in haloids]),:] for id in haloids}
-
-    #check shapes
-    print([galaxies_masked[id].shape[0] for id in haloids])
 
     #times
     snaptime=galaxies_masked[id1]['Time'].values
