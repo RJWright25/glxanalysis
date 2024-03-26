@@ -9,7 +9,8 @@ setup(
     long_description=open('README.md').read(),  # Make sure you have a README.md file
     long_description_content_type="text/markdown",
     url="https://github.com/RJWright25/simpipeline_helsinki",  
-    packages=find_packages(),
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},    
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
