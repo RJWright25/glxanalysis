@@ -708,3 +708,62 @@ def gen_merger_animation(simulation,numproc=1,fps=10,ids=None,useminpot=False,ve
                 if img.endswith(".png")])
     clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(image_files, fps=fps)
     clip.write_videofile(f'plots/render_merger_{int(ids[0])}_{int(ids[1])}/animation.mp4')
+
+
+
+
+############ KETJU BINARIES ############
+
+def plot_bhbinarypars(simulation,binaries=None):
+    """
+    Plot the binary parameters of the black holes in the simulation.
+    
+    Parameters
+    ----------
+    simulation : simulation object
+        Simulation object containing the data to be plotted.
+        NB: The simulation object must contain the following data:
+        - ketjubinaries: dictionary of pandas dataframes containing the properties of the black hole binaries.
+
+    binaries : list
+        List of binary ID tuples to plot. If None, plot all binaries.
+
+    Returns
+    ----------
+    None (writes the output to a file).
+
+    """
+
+    if not binaries:
+        binaries=[list(simulation.ketjubinaries.keys())]
+
+    for binary in binaries:
+        binarypars=simulation.ketjubinaries[binary]
+
+        # plot a and e
+        fig,axes=plt.subplots(2,1,figsize=(5,4),gridspec_kw={'left':0.15,'right':0.95,'bottom':0.15,'top':0.95,'hspace':0.2,'wspace':0.3})
+
+        for ax in axes:
+            ax.grid(True,which='major',alpha=1)
+
+        axes[0].plot(binarypars['t'],binarypars['a'],c='k',lw=2.5)
+        axes[0].plot(binarypars['t'],binarypars['a'],c='grey',lw=1.5)
+        axes[0].set_ylabel(r'$a$ [kpc]')
+
+        axes[1].plot(binarypars['t'],binarypars['e'],c='k',lw=2.5)
+        axes[1].plot(binarypars['t'],binarypars['e'],c='grey',lw=1.5)
+        axes[1].set_ylabel(r'$e$')
+
+        if not tlims:
+            tlims=(binarypars['t'].values[0]-1e6,binarypars['t'].values[-1]+1e6)
+        axes[0].set_xlim(tlims)
+        axes[1].set_xlim(tlims)
+
+        axes[1].set_xlabel(r'$t$ [Gyr]')
+        fig.set_dpi(dpi)
+        plt.savefig(f'plots/ketjubinary_{binary}.png',dpi=dpi)
+        plt.show()
+    
+
+
+

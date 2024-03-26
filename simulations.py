@@ -471,3 +471,19 @@ class gadget_simulation:
 
 
 
+
+    # KETJU binaries
+    def plot_bhbinarypars(self,binaries=None):
+
+        """
+        Plot the binary parameters of the black holes.
+
+        Parameters:
+        -----------
+        binaries: dict
+            The binary orbital params from ketjugw.binary objects.
+
+        """
+
+        plot_bhbinarypars(self,binaries=binaries)
+
