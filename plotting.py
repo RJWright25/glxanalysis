@@ -741,7 +741,7 @@ def plot_bhbinarypars(simulation,binaries=None):
         binarypars=simulation.ketjubinaries[binary]
 
         # plot a and e
-        fig,axes=plt.subplots(2,1,figsize=(5,4),gridspec_kw={'left':0.15,'right':0.95,'bottom':0.15,'top':0.95,'hspace':0.2,'wspace':0.3})
+        fig,axes=plt.subplots(2,1,figsize=(5,4),gridspec_kw={'left':0.15,'right':0.95,'bottom':0.15,'top':0.95,'hspace':0,'wspace':0.3})
 
         for ax in axes:
             ax.grid(True,which='major',alpha=1)
@@ -765,7 +765,7 @@ def plot_bhbinarypars(simulation,binaries=None):
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
 
-        fig.set_suptitle(f'Binary: {binary[0]} + {binary[1]}\n {simulation.snapshots[-1].snapshot_file.split("/")[:-1].join("/")}')
+        fig.suptitle(f'Binary: {binary[0]} + {binary[1]}\n {simulation.snapshots[-1].snapshot_file.split("/")[:-1].join("/")}')
         
         fig.set_dpi(dpi)
         plt.savefig(f'plots/ketjubinary_{binary}.png',dpi=dpi)
