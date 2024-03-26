@@ -735,7 +735,7 @@ def plot_bhbinarypars(simulation,binaries=None):
     """
 
     if not binaries:
-        binaries=[list(simulation.ketjubinaries.keys())]
+        binaries=list(simulation.ketjubinaries.keys())
 
     for binary in binaries:
         binarypars=simulation.ketjubinaries[binary]
