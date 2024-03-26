@@ -62,15 +62,20 @@ def plot_glxevol(simulation,id=None):
     axes : matplotlib axes
         The axes object containing the plot.
     """
-
-    haloes=simulation.haloes
+    
     galaxies=simulation.galaxies
     bhdetails=simulation.bhdetails
+    
+    #make sure the dataframes are sorted
+    galaxies.sort_values(by='Time',ascending=True,inplace=True)
+    galaxies.reset_index(drop=True,inplace=True)
+    bhdetails.sort_values(by='Time',ascending=True,inplace=True)
+    bhdetails.reset_index(drop=True,inplace=True)
 
     #if no id is given, take the first halo
     if not id:
         #figure out which halo is the primary
-        ids=haloes['ID'].unique()
+        ids=galaxies['ID'].unique()
         ids_shape={id:galaxies.loc[galaxies['ID'].values==id,:].shape[0] for id in ids}
         id=[id for id in ids if ids_shape[id]==np.max(list(ids_shape.values()))][0]
 
@@ -164,13 +169,19 @@ def plot_glxsep(simulation,id1=None,id2=None,bh_subsample=10):
 
     """
 
-    haloes=simulation.haloes
     galaxies=simulation.galaxies
     bhdetails=simulation.bhdetails
+    
+    #make sure the dataframes are sorted
+    galaxies.sort_values(by='Time',ascending=True,inplace=True)
+    galaxies.reset_index(drop=True,inplace=True)
+
+    bhdetails.sort_values(by='Time',ascending=True,inplace=True)
+    bhdetails.reset_index(drop=True,inplace=True)
 
     #if no ids are given, take the first two haloes
     if not id1 or not id2:
-        haloids=haloes['ID'].unique()[:2]
+        haloids=galaxies['ID'].unique()[:2]
         id1=haloids[0];id2=haloids[1]
     else:
         haloids=[id1,id2]
