@@ -218,7 +218,7 @@ def read_ketjubhdata(simulation,path=None):
         The black hole data as ketjugw.particle objects.
     ketjubinaries : dict of ID pairs
         The binary orbital params from ketjugw.binary objects.
-        
+
     """
 
     try:
@@ -240,6 +240,9 @@ def read_ketjubhdata(simulation,path=None):
         pars = ketjugw.orbital_parameters(*bbh)
         if pars['t'].shape[0]>10:
             ketjubinaries[bhids] = pars
+
+        pars['t'] = pars['t']/ketjugw.units.yr
+        pars['a_R'] = pars['a_R']/ketjugw.units.pc
 
     return ketjubhs,ketjubinaries
 
