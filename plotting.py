@@ -610,7 +610,7 @@ def render_merger_worker(snaplist,galaxies,ids=None,useminpot=False,verbose=Fals
             ax.scatter(x2-center[0],y2-center[1],s=1,c=f'k',zorder=2)
             ax.add_artist(plt.Circle(radius=rad2,xy=[x2-center[0],y2-center[1]],color=f'w',lw=0.5,ls='--',fill=False,zorder=2))
         else:
-            ax.text(x=0.05,y=0.95,s='Merged',transform=ax.transAxes,ha='left',va='top',color='w')
+            ax.text(x=0.5,y=0.95,s='Merged',transform=ax.transAxes,ha='center',va='top',color='w')
         
         ax.set_xlim(-frame,frame)
         ax.set_ylim(-frame,frame)
