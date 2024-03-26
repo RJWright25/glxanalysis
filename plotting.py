@@ -746,12 +746,12 @@ def plot_bhbinarypars(simulation,binaries=None):
         for ax in axes:
             ax.grid(True,which='major',alpha=1)
 
-        axes[0].plot(binarypars['t'],binarypars['a'],c='k',lw=2.5)
-        axes[0].plot(binarypars['t'],binarypars['a'],c='grey',lw=1.5)
+        axes[0].plot(binarypars['t'],binarypars['a_R'],c='k',lw=2.5)
+        axes[0].plot(binarypars['t'],binarypars['a_R'],c='grey',lw=1.5)
         axes[0].set_ylabel(r'$a$ [kpc]')
 
-        axes[1].plot(binarypars['t'],binarypars['e'],c='k',lw=2.5)
-        axes[1].plot(binarypars['t'],binarypars['e'],c='grey',lw=1.5)
+        axes[1].plot(binarypars['t'],binarypars['e_t'],c='k',lw=2.5)
+        axes[1].plot(binarypars['t'],binarypars['e_t'],c='grey',lw=1.5)
         axes[1].set_ylabel(r'$e$')
 
         if not tlims:
