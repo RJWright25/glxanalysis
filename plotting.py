@@ -741,7 +741,7 @@ def plot_bhbinarypars(simulation,binaries=None):
         binarypars=simulation.ketjubinaries[binary]
 
         # plot a and e
-        fig,axes=plt.subplots(2,1,figsize=(5,4),gridspec_kw={'left':0.15,'right':0.95,'bottom':0.15,'top':0.95,'hspace':0,'wspace':0.3})
+        fig,axes=plt.subplots(2,1,figsize=(5.5,4),gridspec_kw={'left':0.1,'right':0.97,'bottom':0.1,'top':0.9,'hspace':0,'wspace':0.3})
 
         for ax in axes:
             ax.grid(True,which='major',alpha=1)
@@ -750,12 +750,13 @@ def plot_bhbinarypars(simulation,binaries=None):
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='grey',lw=1.5)
         axes[0].set_ylabel(r'$a$ [kpc]')
         axes[0].set_yscale('log')
-        axes[0].set_ylim(10**-3,10**2)
+        axes[0].set_ylim(10**-3.5,10**2)
+        axes[0].set_xticklabels([])
 
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='k',lw=2.5)
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='grey',lw=1.5)
         axes[1].set_ylabel(r'$e$')
-        axes[1].set_ylim(0,1)
+        axes[1].set_ylim(0,1.1)
 
         tlims=(binarypars['t'][0]-1e6,binarypars['t'][-1]+1e6)
         axes[0].set_xlim(tlims)
@@ -765,7 +766,7 @@ def plot_bhbinarypars(simulation,binaries=None):
         if not os.path.exists(os.getcwd()+'/plots/'):
             os.mkdir(os.getcwd()+'/plots/')
 
-        fig.suptitle(f'Binary: {binary[0]} + {binary[1]}\n {"/".join(simulation.snapshots[0].snapshot_file.split("/")[:-1])}')
+        fig.suptitle(f'Binary: ID1: {binary[0]} and ID2: {binary[1]}\n {"/".join(simulation.snapshots[0].snapshot_file.split("/")[:-1])}',fontsize=8)
         
         fig.set_dpi(dpi)
         plt.savefig(f'plots/ketjubinary_{binary}.png',dpi=dpi)
