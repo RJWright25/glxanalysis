@@ -746,8 +746,6 @@ def plot_bhbinarypars(simulation,binaries=None):
         for ax in axes:
             ax.grid(True,which='major',alpha=1)
 
-        
-
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='k',lw=2.5)
         axes[0].plot(binarypars['t'],binarypars['a_R'],c='grey',lw=1.5)
         axes[0].set_ylabel(r'$a$ [kpc]')
@@ -757,14 +755,18 @@ def plot_bhbinarypars(simulation,binaries=None):
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='k',lw=2.5)
         axes[1].plot(binarypars['t'],binarypars['e_t'],c='grey',lw=1.5)
         axes[1].set_ylabel(r'$e$')
-        axes[1].set_ylims(0,1)
+        axes[1].set_ylim(0,1)
 
         tlims=(binarypars['t'][0]-1e6,binarypars['t'][-1]+1e6)
         axes[0].set_xlim(tlims)
         axes[1].set_xlim(tlims)
-
-
         axes[1].set_xlabel(r'$t$ [Gyr]')
+
+        if not os.path.exists(os.getcwd()+'/plots/'):
+            os.mkdir(os.getcwd()+'/plots/')
+
+        fig.set_suptitle(f'Binary: {binary[0]} + {binary[1]}\n {simulation.snapshots[-1].snapshot_file.split("/")[:-1].join("/")}')
+        
         fig.set_dpi(dpi)
         plt.savefig(f'plots/ketjubinary_{binary}.png',dpi=dpi)
         plt.show()
