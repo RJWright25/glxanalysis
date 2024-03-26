@@ -177,7 +177,8 @@ def plot_glxsep(simulation,ids=None,bh_subsample=10):
         haloids=galaxies['ID'].unique()[:2]
         id1=haloids[0];id2=haloids[1]
     else:
-        haloids=[ids[0],ids[1]]
+        id1=ids[0];id2=ids[1]
+        haloids=ids
     
     #mask galaxies and bhdetails
     galaxies_masked={id:galaxies.loc[galaxies['ID'].values==id,:] for id in haloids}
